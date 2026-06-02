@@ -6,3 +6,5 @@
 ^code-depends\.R$
 ^README\.Rmd$
 ^LICENSE\.md$
+^doc$
+^Meta$

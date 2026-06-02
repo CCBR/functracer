@@ -1,4 +1,4 @@
 library(testthat)
-library(calltracer)
+library(functracer)
 
-test_check("calltracer")
+test_check("functracer")

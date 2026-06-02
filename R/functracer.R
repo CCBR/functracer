@@ -53,9 +53,18 @@ analyze_dependencies <- function(
     dir.create(output_dir, recursive = TRUE)
   }
 
-  output_csv <- file.path(output_dir, paste0(output_prefix, "_dependencies.csv"))
-  output_json <- file.path(output_dir, paste0(output_prefix, "_dependencies.json"))
-  output_svg <- file.path(output_dir, paste0(output_prefix, "_dependencies.svg"))
+  output_csv <- file.path(
+    output_dir,
+    paste0(output_prefix, "_dependencies.csv")
+  )
+  output_json <- file.path(
+    output_dir,
+    paste0(output_prefix, "_dependencies.json")
+  )
+  output_svg <- file.path(
+    output_dir,
+    paste0(output_prefix, "_dependencies.svg")
+  )
 
   exported_functions <- extract_exported_functions(namespace_file)
 
@@ -81,7 +90,8 @@ analyze_dependencies <- function(
       local_deps <- unique(c(
         local_deps,
         call_df$call_name[
-          call_df$call_name %in% c(known_package_functions, entry_local_functions)
+          call_df$call_name %in%
+            c(known_package_functions, entry_local_functions)
         ]
       ))
     }
@@ -115,7 +125,8 @@ analyze_dependencies <- function(
       basename(entry_script),
       package_name
     )
-    transitive_df$is_exported <- transitive_df[["function"]] %in% exported_functions
+    transitive_df$is_exported <- transitive_df[["function"]] %in%
+      exported_functions
     transitive_df <- transitive_df[
       order(
         transitive_df$hop_depth,
@@ -141,7 +152,12 @@ analyze_dependencies <- function(
     dependencies_by_depth = split(transitive_df, transitive_df$hop_depth)
   )
 
-  jsonlite::write_json(json_payload, output_json, auto_unbox = TRUE, pretty = TRUE)
+  jsonlite::write_json(
+    json_payload,
+    output_json,
+    auto_unbox = TRUE,
+    pretty = TRUE
+  )
 
   create_dependency_graph(
     dep_rows = transitive_df,
@@ -161,12 +177,12 @@ analyze_dependencies <- function(
   )
 }
 
-#' Run calltracer and print output paths
+#' Trace Functions and Print Output Paths
 #'
 #' @inheritParams analyze_dependencies
 #' @return Invisibly returns the same list as [analyze_dependencies()].
 #' @export
-run_calltracer <- function(
+trace_functions <- function(
   entry_script,
   package_dir,
   package_name = NULL,
@@ -191,7 +207,10 @@ run_calltracer <- function(
 
 infer_package_name <- function(description_file) {
   if (!file.exists(description_file)) {
-    stop("Cannot infer package name because DESCRIPTION is missing: ", description_file)
+    stop(
+      "Cannot infer package name because DESCRIPTION is missing: ",
+      description_file
+    )
   }
 
   desc <- read.dcf(description_file)
@@ -632,7 +651,12 @@ create_dependency_graph <- function(
   depth_vals[entry_label] <- 0
 
   finite_depth <- depth_vals[is.finite(depth_vals)]
-  palette <- grDevices::colorRampPalette(c("#0b3954", "#087e8b", "#bfd7ea", "#ff5a5f"))
+  palette <- grDevices::colorRampPalette(c(
+    "#0b3954",
+    "#087e8b",
+    "#bfd7ea",
+    "#ff5a5f"
+  ))
   max_depth <- if (length(finite_depth) == 0) 1 else max(finite_depth)
   color_steps <- palette(max_depth + 1)
 

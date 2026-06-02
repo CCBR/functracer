@@ -2,9 +2,9 @@
 
 usage <- function() {
   cat(
-    "calltracer CLI\n",
+    "functracer CLI\n",
     "Usage:\n",
-    "  Rscript inst/scripts/calltracer.R --entry=path/to/main.R --package-dir=path/to/pkg [options]\n\n",
+    "  Rscript inst/scripts/functracer.R --entry=path/to/main.R --package-dir=path/to/pkg [options]\n\n",
     "Options:\n",
     "  --entry=PATH          Entry R script to analyze (required)\n",
     "  --package-dir=PATH    Target package root with R/ and NAMESPACE (required)\n",
@@ -49,11 +49,17 @@ script_arg <- grep("^--file=", commandArgs(), value = TRUE)
 if (length(script_arg) == 0) {
   stop("Unable to determine script path from commandArgs()")
 }
-script_path <- normalizePath(sub("^--file=", "", script_arg[1]), mustWork = TRUE)
-pkg_root <- normalizePath(file.path(dirname(script_path), "..", ".."), mustWork = TRUE)
-source(file.path(pkg_root, "R", "calltracer.R"), local = TRUE)
+script_path <- normalizePath(
+  sub("^--file=", "", script_arg[1]),
+  mustWork = TRUE
+)
+pkg_root <- normalizePath(
+  file.path(dirname(script_path), "..", ".."),
+  mustWork = TRUE
+)
+source(file.path(pkg_root, "R", "functracer.R"), local = TRUE)
 
-run_calltracer(
+trace_functions(
   entry_script = args$entry,
   package_dir = args[["package-dir"]],
   package_name = args[["package-name"]],
