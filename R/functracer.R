@@ -226,6 +226,120 @@ infer_package_name <- function(description_file) {
   pkg
 }
 
+get_treesitter_language <- function() {
+  if (!requireNamespace("treesitter", quietly = TRUE)) {
+    stop("Package 'treesitter' is required but not installed")
+  }
+  if (!requireNamespace("treesitter.r", quietly = TRUE)) {
+    stop("Package 'treesitter.r' is required but not installed")
+  }
+
+  treesitter.r::language()
+}
+
+parse_file_with_treesitter <- function(path) {
+  source_text <- readr::read_file(path)
+  treesitter::text_parse(source_text, get_treesitter_language())
+}
+
+walk_named_nodes <- function(node, visitor) {
+  visitor(node)
+  children <- treesitter::node_named_children(node)
+  if (length(children) == 0) {
+    return(invisible(NULL))
+  }
+  for (child in children) {
+    walk_named_nodes(child, visitor)
+  }
+  invisible(NULL)
+}
+
+get_assignment_operator <- function(node) {
+  op_node <- treesitter::node_child_by_field_name(node, "operator")
+  if (is.null(op_node)) {
+    return(NA_character_)
+  }
+  treesitter::node_text(op_node)
+}
+
+get_identifier_text <- function(node) {
+  if (is.null(node)) {
+    return(NA_character_)
+  }
+  if (treesitter::node_type(node) != "identifier") {
+    return(NA_character_)
+  }
+  treesitter::node_text(node)
+}
+
+namespace_call_parts <- function(node) {
+  if (is.null(node) || treesitter::node_type(node) != "namespace_operator") {
+    return(NULL)
+  }
+  lhs <- treesitter::node_child_by_field_name(node, "lhs")
+  rhs <- treesitter::node_child_by_field_name(node, "rhs")
+  op <- treesitter::node_child_by_field_name(node, "operator")
+  list(
+    pkg = get_identifier_text(lhs),
+    fun = get_identifier_text(rhs),
+    op = if (is.null(op)) NA_character_ else treesitter::node_text(op)
+  )
+}
+
+extract_first_call_argument_identifier <- function(call_node) {
+  args_node <- treesitter::node_child_by_field_name(call_node, "arguments")
+  if (is.null(args_node)) {
+    return(NA_character_)
+  }
+  arg_nodes <- treesitter::node_named_children(args_node)
+  if (length(arg_nodes) == 0) {
+    return(NA_character_)
+  }
+  arg_nodes <- Filter(
+    function(x) treesitter::node_type(x) == "argument",
+    arg_nodes
+  )
+  if (length(arg_nodes) == 0) {
+    return(NA_character_)
+  }
+  first_value <- treesitter::node_child_by_field_name(arg_nodes[[1]], "value")
+  get_identifier_text(first_value)
+}
+
+call_info_from_call_node <- function(call_node, include_line = FALSE) {
+  fn_node <- treesitter::node_child_by_field_name(call_node, "function")
+  if (is.null(fn_node)) {
+    return(NULL)
+  }
+
+  fn_type <- treesitter::node_type(fn_node)
+  if (fn_type == "identifier") {
+    out <- list(
+      call_name = treesitter::node_text(fn_node),
+      pkg = NA_character_
+    )
+  } else if (fn_type == "namespace_operator") {
+    ns <- namespace_call_parts(fn_node)
+    if (is.null(ns) || is.na(ns$fun)) {
+      return(NULL)
+    }
+    out <- list(
+      call_name = ns$fun,
+      pkg = ns$pkg
+    )
+  } else {
+    return(NULL)
+  }
+
+  if (include_line) {
+    out$line <- as.integer(
+      treesitter::point_row(treesitter::node_start_point(call_node)) + 1
+    )
+  }
+
+  out
+}
+
 extract_exported_functions <- function(namespace_path) {
   namespace_lines <- readLines(namespace_path, warn = FALSE)
   exported <- grep('^export\\(', namespace_lines, value = TRUE)
@@ -254,38 +368,26 @@ get_namespace_call <- function(call_expr) {
 }
 
 extract_calls_from_expr <- function(expr) {
-  calls <- list()
-
-  walk_expr <- function(node) {
-    if (is.call(node)) {
-      head <- node[[1]]
-      call_info <- NULL
-
-      if (is.symbol(head)) {
-        fn <- as.character(head)
-        call_info <- list(call_name = fn, pkg = NA_character_)
-      } else if (is.call(head)) {
-        ns_call <- get_namespace_call(head)
-        if (!is.null(ns_call)) {
-          call_info <- list(call_name = ns_call$fun, pkg = ns_call$pkg)
-        }
-      }
-
-      if (!is.null(call_info)) {
-        calls[[length(calls) + 1]] <<- call_info
-      }
-
-      for (idx in seq_along(node)) {
-        walk_expr(node[[idx]])
-      }
-    } else if (is.pairlist(node) || is.expression(node)) {
-      for (idx in seq_along(node)) {
-        walk_expr(node[[idx]])
-      }
-    }
+  if (is.null(expr)) {
+    return(data.frame(
+      call_name = character(),
+      pkg = character(),
+      stringsAsFactors = FALSE
+    ))
   }
 
-  walk_expr(expr)
+  calls <- list()
+
+  walk_named_nodes(expr, function(node) {
+    if (treesitter::node_type(node) != "call") {
+      return(invisible(NULL))
+    }
+    info <- call_info_from_call_node(node)
+    if (!is.null(info)) {
+      calls[[length(calls) + 1]] <<- info
+    }
+    invisible(NULL)
+  })
 
   if (length(calls) == 0) {
     return(data.frame(
@@ -311,107 +413,87 @@ extract_function_definitions <- function(parsed_exprs) {
     fn_map[[fn_name]][[length(fn_map[[fn_name]]) + 1]] <<- body_expr
   }
 
-  get_ns_fun_name <- function(call_expr) {
-    if (!is.call(call_expr) || length(call_expr) < 3) {
-      return(NA_character_)
+  walk_named_nodes(parsed_exprs, function(node) {
+    if (treesitter::node_type(node) != "binary_operator") {
+      return(invisible(NULL))
     }
-    op <- if (is.symbol(call_expr[[1]])) {
-      as.character(call_expr[[1]])
-    } else {
-      NA_character_
+
+    op <- get_assignment_operator(node)
+    if (!op %in% c("<-", "=")) {
+      return(invisible(NULL))
     }
-    if (!(op %in% c("::", ":::"))) {
-      return(NA_character_)
+
+    lhs <- treesitter::node_child_by_field_name(node, "lhs")
+    rhs <- treesitter::node_child_by_field_name(node, "rhs")
+    if (is.null(lhs) || is.null(rhs)) {
+      return(invisible(NULL))
     }
-    if (!is.symbol(call_expr[[3]])) {
-      return(NA_character_)
+
+    rhs_type <- treesitter::node_type(rhs)
+
+    if (
+      treesitter::node_type(lhs) == "identifier" &&
+        rhs_type == "function_definition"
+    ) {
+      fn_name <- treesitter::node_text(lhs)
+      fn_body <- treesitter::node_child_by_field_name(rhs, "body")
+      append_body(fn_name, fn_body)
+      return(invisible(NULL))
     }
-    as.character(call_expr[[3]])
-  }
 
-  walk_expr <- function(node) {
-    if (is.call(node) && length(node) >= 3) {
-      op <- if (is.symbol(node[[1]])) as.character(node[[1]]) else NA_character_
-      if (op %in% c("<-", "=")) {
-        lhs <- node[[2]]
-        rhs <- node[[3]]
+    if (treesitter::node_type(lhs) == "identifier" && rhs_type == "call") {
+      rhs_fn <- treesitter::node_child_by_field_name(rhs, "function")
+      ns <- namespace_call_parts(rhs_fn)
+      if (!is.null(ns) && ns$pkg == "S7" && ns$fun == "new_generic") {
+        append_body(treesitter::node_text(lhs), NULL)
+      }
+      return(invisible(NULL))
+    }
 
-        rhs_head <- if (is.call(rhs) && is.symbol(rhs[[1]])) {
-          as.character(rhs[[1]])
-        } else {
-          NA_character_
-        }
-        rhs_ns_head <- if (is.call(rhs)) {
-          get_ns_fun_name(rhs[[1]])
-        } else {
-          NA_character_
-        }
+    if (
+      treesitter::node_type(lhs) == "call" && rhs_type == "function_definition"
+    ) {
+      lhs_fn <- treesitter::node_child_by_field_name(lhs, "function")
+      is_method <- FALSE
 
-        if (is.symbol(lhs) && identical(rhs_head, "function")) {
-          append_body(as.character(lhs), rhs[[3]])
-        }
+      if (!is.null(lhs_fn) && treesitter::node_type(lhs_fn) == "identifier") {
+        is_method <- identical(treesitter::node_text(lhs_fn), "method")
+      } else {
+        ns <- namespace_call_parts(lhs_fn)
+        is_method <- !is.null(ns) && ns$fun == "method"
+      }
 
-        if (
-          is.symbol(lhs) && !is.na(rhs_ns_head) && rhs_ns_head == "new_generic"
-        ) {
-          append_body(as.character(lhs), NULL)
-        }
-
-        lhs_head <- if (is.call(lhs) && is.symbol(lhs[[1]])) {
-          as.character(lhs[[1]])
-        } else {
-          NA_character_
-        }
-        lhs_ns_head <- if (is.call(lhs)) {
-          get_ns_fun_name(lhs[[1]])
-        } else {
-          NA_character_
-        }
-
-        if (
-          is.call(lhs) &&
-            identical(rhs_head, "function") &&
-            (lhs_head == "method" || lhs_ns_head == "method")
-        ) {
-          if (length(lhs) >= 2 && is.symbol(lhs[[2]])) {
-            append_body(as.character(lhs[[2]]), rhs[[3]])
-          }
+      if (is_method) {
+        method_name <- extract_first_call_argument_identifier(lhs)
+        if (!is.na(method_name)) {
+          fn_body <- treesitter::node_child_by_field_name(rhs, "body")
+          append_body(method_name, fn_body)
         }
       }
     }
 
-    if (is.call(node) || is.expression(node) || is.pairlist(node)) {
-      for (i in seq_along(node)) {
-        walk_expr(node[[i]])
-      }
-    }
-  }
+    invisible(NULL)
+  })
 
-  walk_expr(parsed_exprs)
   fn_map
 }
 
 extract_direct_calls_from_script <- function(script_path) {
-  parser_used <- "base-parse"
-  if (requireNamespace("treesitter", quietly = TRUE)) {
-    ts_tree_parse <- get0(
-      "tree_parse",
-      asNamespace("treesitter"),
-      inherits = FALSE
-    )
-    if (is.function(ts_tree_parse)) {
-      parser_used <- "treesitter-available-fallback-to-base"
+  parsed_exprs <- parse_file_with_treesitter(script_path)
+
+  calls <- list()
+  walk_named_nodes(parsed_exprs, function(node) {
+    if (treesitter::node_type(node) != "call") {
+      return(invisible(NULL))
     }
-  }
+    info <- call_info_from_call_node(node, include_line = TRUE)
+    if (!is.null(info)) {
+      calls[[length(calls) + 1]] <<- info
+    }
+    invisible(NULL)
+  })
 
-  parsed_exprs <- parse(file = script_path, keep.source = TRUE)
-  pd <- utils::getParseData(parsed_exprs)
-
-  fn_tokens <- pd[
-    pd$token == "SYMBOL_FUNCTION_CALL",
-    c("line1", "text", "parent")
-  ]
-  if (nrow(fn_tokens) == 0) {
+  if (length(calls) == 0) {
     direct_calls <- data.frame(
       line = integer(),
       function_name = character(),
@@ -421,32 +503,26 @@ extract_direct_calls_from_script <- function(script_path) {
     )
   } else {
     direct_calls <- data.frame(
-      line = fn_tokens$line1,
-      function_name = fn_tokens$text,
-      call_type = "unqualified",
-      package = NA_character_,
+      line = as.integer(vapply(calls, function(x) x$line, integer(1))),
+      function_name = vapply(calls, function(x) x$call_name, character(1)),
+      package = vapply(
+        calls,
+        function(x) {
+          if (is.null(x$pkg) || is.na(x$pkg)) {
+            return(NA_character_)
+          }
+          x$pkg
+        },
+        character(1)
+      ),
       stringsAsFactors = FALSE
     )
 
-    for (i in seq_len(nrow(fn_tokens))) {
-      parent_id <- fn_tokens$parent[i]
-      ns_row <- pd[
-        pd$id == parent_id & pd$token %in% c("NS_GET", "NS_GET_INT"),
-        ,
-        drop = FALSE
-      ]
-      if (nrow(ns_row) > 0) {
-        pkg_row <- pd[
-          pd$parent == parent_id & pd$token == "SYMBOL_PACKAGE",
-          ,
-          drop = FALSE
-        ]
-        if (nrow(pkg_row) > 0) {
-          direct_calls$call_type[i] <- "namespaced"
-          direct_calls$package[i] <- pkg_row$text[1]
-        }
-      }
-    }
+    direct_calls$call_type <- ifelse(
+      is.na(direct_calls$package),
+      "unqualified",
+      "namespaced"
+    )
 
     direct_calls <- direct_calls[
       order(direct_calls$line, direct_calls$function_name),
@@ -456,7 +532,7 @@ extract_direct_calls_from_script <- function(script_path) {
 
   list(
     calls = direct_calls,
-    parser_used = parser_used,
+    parser_used = "treesitter-r",
     parsed_exprs = parsed_exprs
   )
 }
@@ -472,7 +548,7 @@ build_package_dependency_map <- function(
   function_source_file <- list()
 
   for (path in files) {
-    parsed <- parse(file = path, keep.source = TRUE)
+    parsed <- parse_file_with_treesitter(path)
     fn_map <- extract_function_definitions(parsed)
     if (length(fn_map) == 0) {
       next

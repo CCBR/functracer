@@ -19,15 +19,15 @@ Imports:
     igraph,
     jsonlite,
     readr,
-    utils
+    treesitter,
+    treesitter.r
 Suggests:
     covr,
     knitr,
     lintr,
     rmarkdown,
     roxygen2,
-    testthat (>= 3.0.0),
-    treesitter
+    testthat (>= 3.0.0)
 Config/testthat/edition: 3
 VignetteBuilder:
     knitr
