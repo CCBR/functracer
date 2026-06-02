@@ -1,0 +1,8 @@
+^\.Rproj\.user$
+^\.git$
+^\.github$
+^plan\.md$
+^venn_diagram_dependencies\.(csv|json|svg)$
+^code-depends\.R$
+^README\.Rmd$
+^LICENSE\.md$

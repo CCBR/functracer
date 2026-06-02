@@ -1,0 +1,21 @@
+function,dep_type,hop_depth,call_path,source,is_exported
+load_moo_from_data_dir,direct,1,main.R -> load_moo_from_data_dir,MOSuite,TRUE
+parse_numeric_vector,direct,1,main.R -> parse_numeric_vector,main.R,FALSE
+parse_optional_vector,direct,1,main.R -> parse_optional_vector,MOSuite,TRUE
+plot_venn_diagram,direct,1,main.R -> plot_venn_diagram,MOSuite,TRUE
+plot_volcano_summary,direct,1,main.R -> plot_volcano_summary,MOSuite,TRUE
+setup_capsule_environment,direct,1,main.R -> setup_capsule_environment,MOSuite,TRUE
+abort_packages_not_installed,indirect,2,main.R -> plot_venn_diagram -> abort_packages_not_installed,MOSuite,FALSE
+abort_packages_not_installed,indirect,2,main.R -> plot_volcano_summary -> abort_packages_not_installed,MOSuite,FALSE
+fromList,indirect,2,main.R -> plot_venn_diagram -> fromList,MOSuite,FALSE
+join_dfs_wide,indirect,2,main.R -> plot_venn_diagram -> join_dfs_wide,MOSuite,TRUE
+join_dfs_wide,indirect,2,main.R -> plot_volcano_summary -> join_dfs_wide,MOSuite,TRUE
+plot_volcano_summary,indirect,2,main.R -> plot_venn_diagram -> plot_volcano_summary,MOSuite,TRUE
+print_or_save_plot,indirect,2,main.R -> plot_venn_diagram -> print_or_save_plot,MOSuite,TRUE
+print_or_save_plot,indirect,2,main.R -> plot_volcano_summary -> print_or_save_plot,MOSuite,TRUE
+abort_packages_not_installed,indirect,3,main.R -> plot_venn_diagram -> plot_volcano_summary -> abort_packages_not_installed,MOSuite,FALSE
+check_packages_installed,indirect,3,main.R -> plot_venn_diagram -> abort_packages_not_installed -> check_packages_installed,MOSuite,FALSE
+check_packages_installed,indirect,3,main.R -> plot_volcano_summary -> abort_packages_not_installed -> check_packages_installed,MOSuite,FALSE
+join_dfs_wide,indirect,3,main.R -> plot_venn_diagram -> plot_volcano_summary -> join_dfs_wide,MOSuite,TRUE
+print_or_save_plot,indirect,3,main.R -> plot_venn_diagram -> plot_volcano_summary -> print_or_save_plot,MOSuite,TRUE
+check_packages_installed,indirect,4,main.R -> plot_venn_diagram -> plot_volcano_summary -> abort_packages_not_installed -> check_packages_installed,MOSuite,FALSE

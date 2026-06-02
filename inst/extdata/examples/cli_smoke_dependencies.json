@@ -1,0 +1,497 @@
+{
+  "metadata": {
+    "generated_at": "2026-06-02 18:51:10.309947",
+    "parser": "base-parse",
+    "entry_script": "/Users/sovacoolkl/projects/NIDAP/MOSuite-plot-venn-diagram/code/main.R",
+    "package_dir": "/Users/sovacoolkl/projects/NIDAP/MOSuite-plot-venn-diagram/code/MOSuite",
+    "package_name": "MOSuite",
+    "roots": ["setup_capsule_environment", "load_moo_from_data_dir", "plot_volcano_summary", "plot_venn_diagram", "parse_optional_vector", "parse_numeric_vector"]
+  },
+  "direct_calls": [
+    {
+      "line": 2,
+      "function_name": "global_entrace",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 3,
+      "function_name": "library",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 4,
+      "function_name": "library",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 5,
+      "function_name": "load_all",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 6,
+      "function_name": "library",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 7,
+      "function_name": "library",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 8,
+      "function_name": "library",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 12,
+      "function_name": "identical",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 12,
+      "function_name": "is.null",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 12,
+      "function_name": "length",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 13,
+      "function_name": "return",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 15,
+      "function_name": "strsplit",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 15,
+      "function_name": "trimws",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 15,
+      "function_name": "unlist",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 17,
+      "function_name": "length",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 18,
+      "function_name": "return",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 20,
+      "function_name": "as.numeric",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 20,
+      "function_name": "suppressWarnings",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 21,
+      "function_name": "any",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 21,
+      "function_name": "is.na",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 22,
+      "function_name": "stop",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 24,
+      "function_name": "return",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 28,
+      "function_name": "setup_capsule_environment",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 31,
+      "function_name": "ArgumentParser",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 33,
+      "function_name": "add_argument",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 39,
+      "function_name": "add_argument",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 45,
+      "function_name": "add_argument",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 51,
+      "function_name": "add_argument",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 57,
+      "function_name": "add_argument",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 63,
+      "function_name": "add_argument",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 69,
+      "function_name": "add_argument",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 75,
+      "function_name": "add_argument",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 81,
+      "function_name": "add_argument",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 87,
+      "function_name": "add_argument",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 93,
+      "function_name": "add_argument",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 99,
+      "function_name": "add_argument",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 105,
+      "function_name": "add_argument",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 111,
+      "function_name": "add_argument",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 117,
+      "function_name": "add_argument",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 123,
+      "function_name": "add_argument",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 129,
+      "function_name": "add_argument",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 135,
+      "function_name": "add_argument",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 141,
+      "function_name": "add_argument",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 147,
+      "function_name": "add_argument",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 153,
+      "function_name": "add_argument",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 159,
+      "function_name": "add_argument",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 165,
+      "function_name": "add_argument",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 171,
+      "function_name": "add_argument",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 177,
+      "function_name": "add_argument",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 183,
+      "function_name": "add_argument",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 189,
+      "function_name": "add_argument",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 197,
+      "function_name": "parse_args",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 200,
+      "function_name": "load_moo_from_data_dir",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 204,
+      "function_name": "plot_volcano_summary",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 211,
+      "function_name": "plot_venn_diagram",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 215,
+      "function_name": "parse_optional_vector",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 217,
+      "function_name": "parse_numeric_vector",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 221,
+      "function_name": "parse_optional_vector",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 225,
+      "function_name": "parse_numeric_vector",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 228,
+      "function_name": "parse_numeric_vector",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 247,
+      "function_name": "write_csv",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 249,
+      "function_name": "file.path",
+      "call_type": "unqualified"
+    },
+    {
+      "line": 249,
+      "function_name": "getOption",
+      "call_type": "unqualified"
+    }
+  ],
+  "dependencies_by_depth": {
+    "1": [
+      {
+        "function": "load_moo_from_data_dir",
+        "dep_type": "direct",
+        "hop_depth": 1,
+        "call_path": "main.R -> load_moo_from_data_dir",
+        "source": "MOSuite",
+        "is_exported": true
+      },
+      {
+        "function": "parse_numeric_vector",
+        "dep_type": "direct",
+        "hop_depth": 1,
+        "call_path": "main.R -> parse_numeric_vector",
+        "source": "main.R",
+        "is_exported": false
+      },
+      {
+        "function": "parse_optional_vector",
+        "dep_type": "direct",
+        "hop_depth": 1,
+        "call_path": "main.R -> parse_optional_vector",
+        "source": "MOSuite",
+        "is_exported": true
+      },
+      {
+        "function": "plot_venn_diagram",
+        "dep_type": "direct",
+        "hop_depth": 1,
+        "call_path": "main.R -> plot_venn_diagram",
+        "source": "MOSuite",
+        "is_exported": true
+      },
+      {
+        "function": "plot_volcano_summary",
+        "dep_type": "direct",
+        "hop_depth": 1,
+        "call_path": "main.R -> plot_volcano_summary",
+        "source": "MOSuite",
+        "is_exported": true
+      },
+      {
+        "function": "setup_capsule_environment",
+        "dep_type": "direct",
+        "hop_depth": 1,
+        "call_path": "main.R -> setup_capsule_environment",
+        "source": "MOSuite",
+        "is_exported": true
+      }
+    ],
+    "2": [
+      {
+        "function": "abort_packages_not_installed",
+        "dep_type": "indirect",
+        "hop_depth": 2,
+        "call_path": "main.R -> plot_venn_diagram -> abort_packages_not_installed",
+        "source": "MOSuite",
+        "is_exported": false
+      },
+      {
+        "function": "abort_packages_not_installed",
+        "dep_type": "indirect",
+        "hop_depth": 2,
+        "call_path": "main.R -> plot_volcano_summary -> abort_packages_not_installed",
+        "source": "MOSuite",
+        "is_exported": false
+      },
+      {
+        "function": "fromList",
+        "dep_type": "indirect",
+        "hop_depth": 2,
+        "call_path": "main.R -> plot_venn_diagram -> fromList",
+        "source": "MOSuite",
+        "is_exported": false
+      },
+      {
+        "function": "join_dfs_wide",
+        "dep_type": "indirect",
+        "hop_depth": 2,
+        "call_path": "main.R -> plot_venn_diagram -> join_dfs_wide",
+        "source": "MOSuite",
+        "is_exported": true
+      },
+      {
+        "function": "join_dfs_wide",
+        "dep_type": "indirect",
+        "hop_depth": 2,
+        "call_path": "main.R -> plot_volcano_summary -> join_dfs_wide",
+        "source": "MOSuite",
+        "is_exported": true
+      },
+      {
+        "function": "plot_volcano_summary",
+        "dep_type": "indirect",
+        "hop_depth": 2,
+        "call_path": "main.R -> plot_venn_diagram -> plot_volcano_summary",
+        "source": "MOSuite",
+        "is_exported": true
+      },
+      {
+        "function": "print_or_save_plot",
+        "dep_type": "indirect",
+        "hop_depth": 2,
+        "call_path": "main.R -> plot_venn_diagram -> print_or_save_plot",
+        "source": "MOSuite",
+        "is_exported": true
+      },
+      {
+        "function": "print_or_save_plot",
+        "dep_type": "indirect",
+        "hop_depth": 2,
+        "call_path": "main.R -> plot_volcano_summary -> print_or_save_plot",
+        "source": "MOSuite",
+        "is_exported": true
+      }
+    ],
+    "3": [
+      {
+        "function": "abort_packages_not_installed",
+        "dep_type": "indirect",
+        "hop_depth": 3,
+        "call_path": "main.R -> plot_venn_diagram -> plot_volcano_summary -> abort_packages_not_installed",
+        "source": "MOSuite",
+        "is_exported": false
+      },
+      {
+        "function": "check_packages_installed",
+        "dep_type": "indirect",
+        "hop_depth": 3,
+        "call_path": "main.R -> plot_venn_diagram -> abort_packages_not_installed -> check_packages_installed",
+        "source": "MOSuite",
+        "is_exported": false
+      },
+      {
+        "function": "check_packages_installed",
+        "dep_type": "indirect",
+        "hop_depth": 3,
+        "call_path": "main.R -> plot_volcano_summary -> abort_packages_not_installed -> check_packages_installed",
+        "source": "MOSuite",
+        "is_exported": false
+      },
+      {
+        "function": "join_dfs_wide",
+        "dep_type": "indirect",
+        "hop_depth": 3,
+        "call_path": "main.R -> plot_venn_diagram -> plot_volcano_summary -> join_dfs_wide",
+        "source": "MOSuite",
+        "is_exported": true
+      },
+      {
+        "function": "print_or_save_plot",
+        "dep_type": "indirect",
+        "hop_depth": 3,
+        "call_path": "main.R -> plot_venn_diagram -> plot_volcano_summary -> print_or_save_plot",
+        "source": "MOSuite",
+        "is_exported": true
+      }
+    ],
+    "4": [
+      {
+        "function": "check_packages_installed",
+        "dep_type": "indirect",
+        "hop_depth": 4,
+        "call_path": "main.R -> plot_venn_diagram -> plot_volcano_summary -> abort_packages_not_installed -> check_packages_installed",
+        "source": "MOSuite",
+        "is_exported": false
+      }
+    ]
+  }
+}

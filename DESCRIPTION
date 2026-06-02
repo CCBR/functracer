@@ -1,0 +1,32 @@
+Package: calltracer
+Title: Trace Transitive Function Dependencies in R Code
+Version: 0.1.0
+Authors@R: c(
+    person("CCBR", role = c("aut", "cre"), email = "ccbr@example.org")
+  )
+Description: Build direct and transitive function dependency graphs from an
+    R entry script and a target package source tree. Exports machine-readable
+    and human-readable artifacts (CSV, JSON, SVG) for impact analysis.
+License: MIT + file LICENSE
+URL: https://github.com/CCBR/calltracer
+BugReports: https://github.com/CCBR/calltracer/issues
+Depends:
+    R (>= 4.1.0)
+Imports:
+    grDevices,
+    igraph,
+    jsonlite,
+    readr,
+    utils
+Suggests:
+    covr,
+    knitr,
+    lintr,
+    rmarkdown,
+    roxygen2,
+    testthat (>= 3.0.0),
+    treesitter
+Config/testthat/edition: 3
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+Config/roxygen2/version: 8.0.0

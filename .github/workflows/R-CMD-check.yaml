@@ -1,0 +1,71 @@
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+name: R-CMD-check
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  R-CMD-check:
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { os: ubuntu-latest, r: 'release' }
+          - { os: ubuntu-latest, r: 'oldrel-1' }
+    runs-on: ${{ matrix.config.os }}
+    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
+    steps:
+      - uses: actions/checkout@v4
+      - uses: CCBR/actions/install-r-pak@main
+        with:
+          versions-file: .github/package-versions.txt
+          extra-packages: local::.
+          needs: dev
+          r-version: ${{ matrix.config.r }}
+          http-user-agent: ${{ matrix.config.http-user-agent }}
+      - uses: r-lib/actions/check-r-package@v2
+        with:
+          upload-snapshots: true
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: CCBR/actions/install-r-pak@main
+        with:
+          r-version: 4.5
+          versions-file: .github/package-versions.txt
+          needs: dev
+      - name: Lint
+        shell: Rscript {0}
+        run: lintr::lint_package()
+        env:
+          LINTR_ERROR_ON_LINT: false
+
+  check:
+    runs-on: ubuntu-latest
+    needs: [R-CMD-check, lint]
+    if: always()
+    steps:
+      - name: Successful build
+        if: ${{ !(contains(needs.*.result, 'failure')) }}
+        run: exit 0
+      - name: Failing build
+        if: ${{ contains(needs.*.result, 'failure') }}
+        run: exit 1

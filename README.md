@@ -1,0 +1,66 @@
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+# calltracer
+
+Trace direct and transitive function dependencies for an R entry script
+against a target package source tree.
+
+<!-- badges: start -->
+
+[![R-CMD-check](https://github.com/CCBR/calltracer/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/CCBR/calltracer/actions/workflows/R-CMD-check.yaml)
+[![test-coverage](https://github.com/CCBR/calltracer/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/CCBR/calltracer/actions/workflows/test-coverage.yaml)
+<!-- badges: end -->
+
+## Features
+
+- Extract direct function calls from an entry script.
+- Build package function adjacency from `R/` source files.
+- Traverse transitive dependencies and retain call paths.
+- Export dependency artifacts as CSV, JSON, and SVG.
+- Supports regular function assignments and S7 generics/methods.
+
+## Install (local)
+
+``` r
+# from the repository root
+install.packages(".", repos = NULL, type = "source")
+```
+
+## Programmatic usage
+
+``` r
+library(calltracer)
+
+result <- analyze_dependencies(
+  entry_script = "path/to/main.R",
+  package_dir = "path/to/package-root",
+  output_dir = ".",
+  output_prefix = "analysis"
+)
+
+result$csv
+result$json
+result$svg
+```
+
+## CLI usage
+
+``` sh
+Rscript inst/scripts/calltracer.R \
+  --entry=path/to/main.R \
+  --package-dir=path/to/package-root \
+  --output-dir=. \
+  --prefix=analysis
+```
+
+## Output schema
+
+CSV includes:
+
+- `function`
+- `dep_type` (`direct` or `indirect`)
+- `hop_depth`
+- `call_path`
+- `source`
+- `is_exported`
