@@ -1,0 +1,73 @@
+# functracer
+
+Trace direct and transitive function dependencies for an R entry script
+against a target package source tree.
+
+## Features
+
+- Extract direct function calls from an entry script.
+- Build package function adjacency from `R/` source files.
+- Traverse transitive dependencies and retain call paths.
+- Export dependency artifacts as CSV, JSON, and SVG.
+- Supports regular function assignments and S7 generics/methods.
+
+## Install (local)
+
+``` r
+# from the repository root
+install.packages(".", repos = NULL, type = "source")
+```
+
+## Programmatic usage
+
+``` r
+library(functracer)
+
+result <- analyze_dependencies(
+  entry_script = "path/to/main.R",
+  package_dir = "path/to/package-root",
+  output_dir = ".",
+  output_prefix = "analysis"
+)
+
+result$csv
+result$json
+result$svg
+```
+
+## CLI usage
+
+``` sh
+Rscript inst/scripts/functracer.R \
+  --entry=path/to/main.R \
+  --package-dir=path/to/package-root \
+  --output-dir=. \
+  --prefix=analysis
+```
+
+## Output schema
+
+CSV includes:
+
+- `function`
+- `dep_type` (`direct` or `indirect`)
+- `hop_depth`
+- `call_path`
+- `source`
+- `is_exported`
+
+# Package index
+
+## All functions
+
+- [`analyze_dependencies()`](https://ccbr.github.io/functracer/reference/analyze_dependencies.md)
+  : Analyze Direct and Transitive R Function Dependencies
+- [`trace_functions()`](https://ccbr.github.io/functracer/reference/trace_functions.md)
+  : Trace Functions and Print Output Paths
+
+# Articles
+
+### Articles
+
+- [functracer: Introductory
+  vignette](https://ccbr.github.io/functracer/articles/intro.md):
