@@ -29,6 +29,7 @@ Suggests:
     roxygen2,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
+Config/Needs/dev: pkgdown
 VignetteBuilder:
     knitr
 Encoding: UTF-8
