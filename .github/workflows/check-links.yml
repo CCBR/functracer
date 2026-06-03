@@ -10,7 +10,7 @@ jobs:
   linkChecker:
     runs-on: ubuntu-latest
     permissions:
-      issues: write
+      issues: write # required for peter-evans/create-issue-from-file
     steps:
       - uses: actions/checkout@v4
 
@@ -27,3 +27,4 @@ jobs:
           title: Link Checker Report
           content-filepath: ./lychee/out.md
           labels: automated issue
+          assignees: kelly-sovacool

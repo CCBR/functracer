@@ -1,0 +1,90 @@
+name: auto-format
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  auto-format:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Generate a token
+        id: generate-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.CCBR_BOT_APP_ID }}
+          private-key: ${{ secrets.CCBR_BOT_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - uses: actions/checkout@v6
+        with:
+          token: ${{ steps.generate-token.outputs.token }}
+          fetch-depth: 0
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref ||
+            github.ref_name }}
+
+      - name: git config
+        run: |
+          git config --global user.name "CCBR-bot"
+          git config --global user.email "258092125+ccbr-bot@users.noreply.github.com"
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.5'
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: local::.
+          needs: dev
+
+      - name: update Galaxy blueprints
+        shell: Rscript {0}
+        run: |
+          source('inst/extdata/galaxy/galaxy.R')
+          write_package_json_blueprints()
+
+      - name: render README.Rmd & docs
+        shell: Rscript {0}
+        run: |
+          rmarkdown::render("README.Rmd")
+          roxygen2::roxygenize()
+
+      - name: update citation
+        shell: Rscript {0}
+        run: |
+          # See https://docs.ropensci.org/cffr/articles/cffr.html
+          library(cffr)
+          mykeys <- list(identifiers = list(list(
+             description = "Archived snapshots of all versions",
+             type = "doi",
+             value = "10.5281/zenodo.16371580"
+          )))
+          cf <- cff_create(keys = mykeys)
+          # Create your CITATION.cff file
+          cff_write(cf)
+
+      - name: update codemeta
+        uses: citation-file-format/cffconvert-github-action@2.0.0
+        with:
+          args: "--format codemeta --outfile codemeta.json"
+
+      - name: format
+        uses: pre-commit/action@v3.0.1
+        continue-on-error: true
+
+      - name: commit & push
+        run: |
+          git add .
+          git commit -m "ci: 🤖 auto-format" || echo "nothing to commit"
+          git push || echo "nothing to push"

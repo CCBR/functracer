@@ -1,2 +1,5 @@
 /doc/
 /Meta/
+# pixi environments
+.pixi/*
+!.pixi/config.toml

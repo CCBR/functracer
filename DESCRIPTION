@@ -1,5 +1,5 @@
 Package: functracer
-Title: Trace Transitive Function Dependencies in R Code
+Title: Trace Function Dependencies in R Code
 Version: 0.1.0
 Authors@R: c(
     person("Kelly", "Sovacool", , "kelly.sovacool@nih.gov", role = c("aut", "cre"),
