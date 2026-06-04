@@ -1,48 +1,62 @@
 #!/usr/bin/env Rscript
 
-usage <- function() {
-  cat(
-    "functracer CLI\n",
-    "Usage:\n",
-    "  Rscript inst/scripts/functracer.R --entry=path/to/main.R --package-dir=path/to/pkg [options]\n\n",
-    "Options:\n",
-    "  --entry=PATH          Entry R script to analyze (required)\n",
-    "  --package-dir=PATH    Target package root with R/ and NAMESPACE (required)\n",
-    "  --package-name=NAME   Package name override (optional)\n",
-    "  --output-dir=PATH     Output directory (default: .)\n",
-    "  --prefix=NAME         Output prefix (default: entry script stem)\n",
-    "  --help                Show this message\n",
-    sep = ""
+#' Load package R sources into an execution environment
+#'
+#' @param pkg_root Path to the package root.
+#'
+#' @return An environment containing the sourced package functions.
+load_package_functions <- function(pkg_root) {
+  r_files <- list.files(
+    file.path(pkg_root, "R"),
+    pattern = "\\.R$",
+    full.names = TRUE
   )
-}
+  r_files <- sort(r_files)
 
-parse_args <- function(args) {
-  out <- list()
-  for (arg in args) {
-    if (identical(arg, "--help")) {
-      out$help <- TRUE
-      next
-    }
-    if (!startsWith(arg, "--") || !grepl("=", arg, fixed = TRUE)) {
-      stop("Invalid argument format: ", arg)
-    }
-    kv <- strsplit(sub("^--", "", arg), "=", fixed = TRUE)[[1]]
-    key <- kv[1]
-    value <- paste(kv[-1], collapse = "=")
-    out[[key]] <- value
+  for (r_file in r_files) {
+    sys.source(r_file, envir = globalenv())
   }
-  out
 }
 
-args <- parse_args(commandArgs(trailingOnly = TRUE))
-if (!is.null(args$help)) {
-  usage()
-  quit(status = 0)
+#' Create the functracer command-line argument parser
+#'
+#' @return An `argparse::ArgumentParser` instance.
+build_parser <- function() {
+  parser <- argparse::ArgumentParser(
+    description = "Trace direct and transitive R function dependencies."
+  )
+
+  parser$add_argument(
+    "--entry",
+    required = TRUE,
+    help = "Entry R script to analyze."
+  )
+  parser$add_argument(
+    "--package-dir",
+    required = TRUE,
+    help = "Target package root with R/ and NAMESPACE."
+  )
+  parser$add_argument(
+    "--package-name",
+    default = NULL,
+    help = "Optional package name override."
+  )
+  parser$add_argument(
+    "--output-dir",
+    default = ".",
+    help = "Directory for CSV, JSON, and SVG output."
+  )
+  parser$add_argument(
+    "--prefix",
+    default = NULL,
+    help = "Optional output filename prefix."
+  )
+
+  parser
 }
 
-if (is.null(args$entry) || is.null(args[["package-dir"]])) {
-  usage()
-  stop("--entry and --package-dir are required")
+if (!requireNamespace("argparse", quietly = TRUE)) {
+  stop("Package 'argparse' is required to run the functracer CLI")
 }
 
 script_arg <- grep("^--file=", commandArgs(), value = TRUE)
@@ -57,7 +71,9 @@ pkg_root <- normalizePath(
   file.path(dirname(script_path), "..", ".."),
   mustWork = TRUE
 )
-source(file.path(pkg_root, "R", "functracer.R"), local = TRUE)
+load_package_functions(pkg_root)
+
+args <- build_parser()$parse_args()
 
 trace_functions(
   entry_script = args$entry,

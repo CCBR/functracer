@@ -60,10 +60,10 @@ result$svg
 
 ```sh
 Rscript inst/scripts/functracer.R \
-  --entry=path/to/main.R \
-  --package-dir=path/to/package-root \
-  --output-dir=. \
-  --prefix=analysis
+  --entry path/to/main.R \
+  --package-dir path/to/package-root \
+  --output-dir . \
+  --prefix analysis
 ```
 
 ### Output schema

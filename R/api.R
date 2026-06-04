@@ -68,7 +68,7 @@ analyze_dependencies <- function(
 
   exported_functions <- extract_exported_functions(namespace_file)
 
-  direct_calls_result <- extract_direct_calls_from_script(entry_script)
+  direct_calls_result <- extract_script_calls(entry_script)
   direct_calls <- direct_calls_result$calls
 
   entry_parsed <- direct_calls_result$parsed_exprs
@@ -113,7 +113,7 @@ analyze_dependencies <- function(
   roots <- unique(c(direct_pkg, direct_entry_local))
   roots <- roots[roots %in% names(dep_map)]
 
-  transitive_df <- compute_transitive_dependencies(
+  transitive_df <- trace_dependencies(
     roots = roots,
     dep_map = dep_map,
     entry_label = basename(entry_script)

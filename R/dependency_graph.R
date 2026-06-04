@@ -1,4 +1,13 @@
-compute_transitive_dependencies <- function(roots, dep_map, entry_label) {
+#' Trace transitive dependencies from root functions
+#'
+#' @param roots Root function names.
+#' @param dep_map Named list of direct dependencies.
+#' @param entry_label Label used for the entry script node.
+#'
+#' @return A data frame describing dependency depth and call paths.
+#' @keywords internal
+#' @noRd
+trace_dependencies <- function(roots, dep_map, entry_label) {
   queue <- vector("list", 0)
   visited <- new.env(parent = emptyenv())
   rows <- vector("list", 0)
@@ -49,22 +58,34 @@ compute_transitive_dependencies <- function(roots, dep_map, entry_label) {
   }
 
   if (length(rows) == 0) {
-    return(data.frame(
+    out <- data.frame(
       "function" = character(),
       dep_type = character(),
       hop_depth = integer(),
       call_path = character(),
       stringsAsFactors = FALSE,
       check.names = FALSE
-    ))
+    )
+  } else {
+    out <- do.call(rbind, rows)
+    out <- out[order(out$hop_depth, out[["function"]], out$call_path), ]
+    rownames(out) <- NULL
   }
 
-  out <- do.call(rbind, rows)
-  out <- out[order(out$hop_depth, out[["function"]], out$call_path), ]
-  rownames(out) <- NULL
   out
 }
 
+#' Render a dependency graph as SVG
+#'
+#' @param dep_rows Dependency rows returned by the traversal.
+#' @param dep_map Named list of direct dependencies.
+#' @param root_functions Root package functions connected to the entry script.
+#' @param entry_label Label used for the entry script node.
+#' @param output_path Path to the output SVG file.
+#'
+#' @return Invisibly returns `NULL`.
+#' @keywords internal
+#' @noRd
 create_dependency_graph <- function(
   dep_rows,
   dep_map,
@@ -109,47 +130,47 @@ create_dependency_graph <- function(
     graphics::plot.new()
     graphics::text(0.5, 0.5, labels = "No package-scoped dependencies detected")
     grDevices::dev.off()
-    return(invisible(NULL))
-  }
+    invisible(NULL)
+  } else {
+    g <- igraph::graph_from_data_frame(edge_df, directed = TRUE)
 
-  g <- igraph::graph_from_data_frame(edge_df, directed = TRUE)
+    depth_lookup <- tapply(dep_rows$hop_depth, dep_rows[["function"]], min)
+    depth_vals <- rep(Inf, length(igraph::V(g)))
+    names(depth_vals) <- igraph::V(g)$name
+    depth_vals[names(depth_lookup)] <- as.numeric(depth_lookup)
+    depth_vals[entry_label] <- 0
 
-  depth_lookup <- tapply(dep_rows$hop_depth, dep_rows[["function"]], min)
-  depth_vals <- rep(Inf, length(igraph::V(g)))
-  names(depth_vals) <- igraph::V(g)$name
-  depth_vals[names(depth_lookup)] <- as.numeric(depth_lookup)
-  depth_vals[entry_label] <- 0
+    finite_depth <- depth_vals[is.finite(depth_vals)]
+    palette <- grDevices::colorRampPalette(c(
+      "#0b3954",
+      "#087e8b",
+      "#bfd7ea",
+      "#ff5a5f"
+    ))
+    max_depth <- if (length(finite_depth) == 0) 1 else max(finite_depth)
+    color_steps <- palette(max_depth + 1)
 
-  finite_depth <- depth_vals[is.finite(depth_vals)]
-  palette <- grDevices::colorRampPalette(c(
-    "#0b3954",
-    "#087e8b",
-    "#bfd7ea",
-    "#ff5a5f"
-  ))
-  max_depth <- if (length(finite_depth) == 0) 1 else max(finite_depth)
-  color_steps <- palette(max_depth + 1)
-
-  vertex_colors <- rep("#cccccc", length(depth_vals))
-  for (nm in names(depth_vals)) {
-    d <- depth_vals[[nm]]
-    if (is.finite(d)) {
-      vertex_colors[which(names(depth_vals) == nm)] <- color_steps[d + 1]
+    vertex_colors <- rep("#cccccc", length(depth_vals))
+    for (nm in names(depth_vals)) {
+      d <- depth_vals[[nm]]
+      if (is.finite(d)) {
+        vertex_colors[which(names(depth_vals) == nm)] <- color_steps[d + 1]
+      }
     }
+
+    grDevices::svg(output_path, width = 14, height = 10)
+    plot(
+      g,
+      layout = igraph::layout_with_fr(g),
+      vertex.size = 16,
+      vertex.label.cex = 0.7,
+      vertex.label.family = "sans",
+      vertex.color = vertex_colors,
+      edge.arrow.size = 0.35,
+      main = paste0("Transitive Dependencies from ", entry_label)
+    )
+    grDevices::dev.off()
+
+    invisible(NULL)
   }
-
-  grDevices::svg(output_path, width = 14, height = 10)
-  plot(
-    g,
-    layout = igraph::layout_with_fr(g),
-    vertex.size = 16,
-    vertex.label.cex = 0.7,
-    vertex.label.family = "sans",
-    vertex.color = vertex_colors,
-    edge.arrow.size = 0.35,
-    main = paste0("Transitive Dependencies from ", entry_label)
-  )
-  grDevices::dev.off()
-
-  invisible(NULL)
 }

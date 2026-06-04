@@ -31,14 +31,24 @@ if (!file.exists(namespace_file)) {
   stop("Cannot find MOSuite NAMESPACE: ", namespace_file)
 }
 
+#' Extract exported functions from a NAMESPACE file
+#'
+#' @param namespace_path Path to a package `NAMESPACE` file.
+#'
+#' @return A character vector of exported function names.
 extract_exported_functions <- function(namespace_path) {
   namespace_lines <- readLines(namespace_path, warn = FALSE)
-  exported <- grep('^export\\(', namespace_lines, value = TRUE)
-  exported <- sub('^export\\("?', "", exported)
-  exported <- sub('"?\\)$', "", exported)
+  exported <- grep("^export\\(", namespace_lines, value = TRUE)
+  exported <- sub("^export\\(\"?", "", exported)
+  exported <- sub("\"?\\)$", "", exported)
   unique(exported)
 }
 
+#' Get package and function names from a namespace call
+#'
+#' @param call_expr A parsed R call expression.
+#'
+#' @return A list with `pkg` and `fun` fields, or `NULL`.
 get_namespace_call <- function(call_expr) {
   if (!is.call(call_expr) || length(call_expr) < 3) {
     return(NULL)
@@ -58,6 +68,11 @@ get_namespace_call <- function(call_expr) {
   list(pkg = pkg, fun = fun)
 }
 
+#' Extract function calls from an expression
+#'
+#' @param expr A parsed R expression.
+#'
+#' @return A data frame of call names and optional package qualifiers.
 extract_calls_from_expr <- function(expr) {
   calls <- list()
 
@@ -106,6 +121,11 @@ extract_calls_from_expr <- function(expr) {
   ))
 }
 
+#' Extract top-level function definitions from parsed expressions
+#'
+#' @param parsed_exprs Parsed R expressions.
+#'
+#' @return A named list mapping function names to body expressions.
 extract_top_level_functions <- function(parsed_exprs) {
   fn_map <- list()
 
@@ -196,7 +216,13 @@ extract_top_level_functions <- function(parsed_exprs) {
   fn_map
 }
 
-extract_direct_calls_from_script <- function(script_path) {
+#' Extract direct calls from a script
+#'
+#' @param script_path Path to an R script.
+#'
+#' @return A list containing direct calls, parser metadata, and parsed
+#'   expressions.
+extract_script_calls <- function(script_path) {
   parser_used <- "base-parse"
   if (requireNamespace("treesitter", quietly = TRUE)) {
     ts_tree_parse <- get0(
@@ -266,6 +292,12 @@ extract_direct_calls_from_script <- function(script_path) {
   )
 }
 
+#' Build a dependency map from a package R directory
+#'
+#' @param r_dir Path to a package `R/` directory.
+#' @param known_package_name Package name used for namespaced self-calls.
+#'
+#' @return A list with dependency mappings, source files, and function names.
 build_package_dependency_map <- function(
   r_dir,
   known_package_name = "MOSuite"
@@ -333,7 +365,13 @@ build_package_dependency_map <- function(
   )
 }
 
-compute_transitive_dependencies <- function(roots, dep_map) {
+#' Trace transitive dependencies from root functions
+#'
+#' @param roots A character vector of root function names.
+#' @param dep_map A named list mapping functions to dependencies.
+#'
+#' @return A data frame describing dependency depth and call paths.
+trace_dependencies <- function(roots, dep_map) {
   queue <- vector("list", 0)
   visited <- new.env(parent = emptyenv())
   rows <- vector("list", 0)
@@ -400,6 +438,14 @@ compute_transitive_dependencies <- function(roots, dep_map) {
   out
 }
 
+#' Create an SVG dependency graph
+#'
+#' @param dep_rows A dependency data frame.
+#' @param dep_map A named list mapping functions to dependencies.
+#' @param root_functions Root functions connected to `main.R`.
+#' @param output_path Path to the SVG output file.
+#'
+#' @return Invisibly creates the graph at `output_path`.
 create_dependency_graph <- function(
   dep_rows,
   dep_map,
@@ -474,7 +520,7 @@ create_dependency_graph <- function(
 
 exported_functions <- extract_exported_functions(namespace_file)
 
-direct_calls_result <- extract_direct_calls_from_script(main_script)
+direct_calls_result <- extract_script_calls(main_script)
 direct_calls <- direct_calls_result$calls
 
 main_parsed <- direct_calls_result$parsed_exprs
@@ -518,7 +564,7 @@ direct_main_local <- unique(direct_calls$function_name[
 roots <- unique(c(direct_mosuite, direct_main_local))
 roots <- roots[roots %in% names(dep_map)]
 
-transitive_df <- compute_transitive_dependencies(roots, dep_map)
+transitive_df <- trace_dependencies(roots, dep_map)
 
 if (nrow(transitive_df) > 0) {
   transitive_df$source <- ifelse(
