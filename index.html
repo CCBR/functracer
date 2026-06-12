@@ -85,23 +85,30 @@
 <span></span>
 <span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/analyze_dependencies.html">analyze_dependencies</a></span><span class="op">(</span></span>
 <span>  entry_script <span class="op">=</span> <span class="st">"path/to/main.R"</span>,</span>
+<span>  package_dir <span class="op">=</span> <span class="st">"path/to/package-root"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">result</span></span>
+<span></span>
+<span><span class="va">output</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/trace_functions.html">trace_functions</a></span><span class="op">(</span></span>
+<span>  entry_script <span class="op">=</span> <span class="st">"path/to/main.R"</span>,</span>
 <span>  package_dir <span class="op">=</span> <span class="st">"path/to/package-root"</span>,</span>
+<span>  output_format <span class="op">=</span> <span class="st">"json"</span>,</span>
 <span>  output_dir <span class="op">=</span> <span class="st">"."</span>,</span>
 <span>  output_prefix <span class="op">=</span> <span class="st">"analysis"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">result</span><span class="op">$</span><span class="va">csv</span></span>
-<span><span class="va">result</span><span class="op">$</span><span class="va">json</span></span>
-<span><span class="va">result</span><span class="op">$</span><span class="va">svg</span></span></code></pre></div>
+<span><span class="va">output</span><span class="op">$</span><span class="va">output_path</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="cli-usage">CLI usage<a class="anchor" aria-label="anchor" href="#cli-usage"></a>
 </h2>
 <div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="ex">Rscript</span> inst/scripts/functracer.R <span class="dt">\</span></span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>  <span class="at">--entry</span><span class="op">=</span>path/to/main.R <span class="dt">\</span></span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  <span class="at">--package-dir</span><span class="op">=</span>path/to/package-root <span class="dt">\</span></span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  <span class="at">--output-dir</span><span class="op">=</span>. <span class="dt">\</span></span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>  <span class="at">--prefix</span><span class="op">=</span>analysis</span></code></pre></div>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>  <span class="at">--entry</span> path/to/main.R <span class="dt">\</span></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  <span class="at">--package-dir</span> path/to/package-root <span class="dt">\</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  <span class="at">--output-format</span> json <span class="dt">\</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>  <span class="at">--output-dir</span> . <span class="dt">\</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>  <span class="at">--prefix</span> analysis</span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="output-schema">Output schema<a class="anchor" aria-label="anchor" href="#output-schema"></a>

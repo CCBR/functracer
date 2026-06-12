@@ -25,24 +25,31 @@ library(functracer)
 
 result <- analyze_dependencies(
   entry_script = "path/to/main.R",
+  package_dir = "path/to/package-root"
+)
+
+result
+
+output <- trace_functions(
+  entry_script = "path/to/main.R",
   package_dir = "path/to/package-root",
+  output_format = "json",
   output_dir = ".",
   output_prefix = "analysis"
 )
 
-result$csv
-result$json
-result$svg
+output$output_path
 ```
 
 ## CLI usage
 
 ``` sh
 Rscript inst/scripts/functracer.R \
-  --entry=path/to/main.R \
-  --package-dir=path/to/package-root \
-  --output-dir=. \
-  --prefix=analysis
+  --entry path/to/main.R \
+  --package-dir path/to/package-root \
+  --output-format json \
+  --output-dir . \
+  --prefix analysis
 ```
 
 ## Output schema

@@ -71,7 +71,7 @@
 <li>Pick an entry script.</li>
 <li>Point to a package source tree.</li>
 <li>Run <code><a href="../reference/analyze_dependencies.html">analyze_dependencies()</a></code>.</li>
-<li>Read the output files.</li>
+<li>Optionally write one output artifact.</li>
 </ol>
 <div class="section level2">
 <h2 id="quick-real-world-call">Quick real-world call<a class="anchor" aria-label="anchor" href="#quick-real-world-call"></a>
@@ -81,14 +81,20 @@
 <span></span>
 <span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/analyze_dependencies.html">analyze_dependencies</a></span><span class="op">(</span></span>
 <span>  entry_script <span class="op">=</span> <span class="st">"path/to/main.R"</span>,</span>
+<span>  package_dir <span class="op">=</span> <span class="st">"path/to/package-root"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">result</span></span>
+<span></span>
+<span><span class="va">output</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/trace_functions.html">trace_functions</a></span><span class="op">(</span></span>
+<span>  entry_script <span class="op">=</span> <span class="st">"path/to/main.R"</span>,</span>
 <span>  package_dir <span class="op">=</span> <span class="st">"path/to/package-root"</span>,</span>
+<span>  output_format <span class="op">=</span> <span class="st">"svg"</span>,</span>
 <span>  output_dir <span class="op">=</span> <span class="st">"."</span>,</span>
 <span>  output_prefix <span class="op">=</span> <span class="st">"analysis"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">result</span><span class="op">$</span><span class="va">csv</span></span>
-<span><span class="va">result</span><span class="op">$</span><span class="va">json</span></span>
-<span><span class="va">result</span><span class="op">$</span><span class="va">svg</span></span></code></pre></div>
+<span><span class="va">output</span><span class="op">$</span><span class="va">output_path</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="tiny-self-contained-example">Tiny self-contained example<a class="anchor" aria-label="anchor" href="#tiny-self-contained-example"></a>
@@ -148,26 +154,39 @@ folder.</p>
 <span></span>
 <span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/analyze_dependencies.html">analyze_dependencies</a></span><span class="op">(</span></span>
 <span>  entry_script <span class="op">=</span> <span class="va">entry_script</span>,</span>
-<span>  package_dir <span class="op">=</span> <span class="va">demo_pkg</span>,</span>
-<span>  output_dir <span class="op">=</span> <span class="va">work_dir</span>,</span>
-<span>  output_prefix <span class="op">=</span> <span class="st">"demo"</span></span>
+<span>  package_dir <span class="op">=</span> <span class="va">demo_pkg</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">result</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"csv"</span>, <span class="st">"json"</span>, <span class="st">"svg"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt; $csv</span></span>
-<span><span class="co">#&gt; [1] "/tmp/RtmpKxnLwc/functracer-demo-1ddd122d4395/demo_dependencies.csv"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $json</span></span>
-<span><span class="co">#&gt; [1] "/tmp/RtmpKxnLwc/functracer-demo-1ddd122d4395/demo_dependencies.json"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $svg</span></span>
-<span><span class="co">#&gt; [1] "/tmp/RtmpKxnLwc/functracer-demo-1ddd122d4395/demo_dependencies.svg"</span></span></code></pre></div>
+<span><span class="va">result</span></span>
+<span><span class="co">#&gt;    function dep_type hop_depth                             call_path  source</span></span>
+<span><span class="co">#&gt; 1   core_fn   direct         1                     main.R -&gt; core_fn demoPkg</span></span>
+<span><span class="co">#&gt; 2       run   direct         1                         main.R -&gt; run  main.R</span></span>
+<span><span class="co">#&gt; 3   core_fn indirect         2              main.R -&gt; run -&gt; core_fn demoPkg</span></span>
+<span><span class="co">#&gt; 4 helper_fn indirect         2        main.R -&gt; core_fn -&gt; helper_fn demoPkg</span></span>
+<span><span class="co">#&gt; 5 helper_fn indirect         3 main.R -&gt; run -&gt; core_fn -&gt; helper_fn demoPkg</span></span>
+<span><span class="co">#&gt;   is_exported</span></span>
+<span><span class="co">#&gt; 1        TRUE</span></span>
+<span><span class="co">#&gt; 2       FALSE</span></span>
+<span><span class="co">#&gt; 3        TRUE</span></span>
+<span><span class="co">#&gt; 4        TRUE</span></span>
+<span><span class="co">#&gt; 5        TRUE</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="inspect-output-data">Inspect output data<a class="anchor" aria-label="anchor" href="#inspect-output-data"></a>
 </h2>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">csv</span>, check.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">output</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/trace_functions.html">trace_functions</a></span><span class="op">(</span></span>
+<span>  entry_script <span class="op">=</span> <span class="va">entry_script</span>,</span>
+<span>  package_dir <span class="op">=</span> <span class="va">demo_pkg</span>,</span>
+<span>  output_format <span class="op">=</span> <span class="st">"csv"</span>,</span>
+<span>  output_dir <span class="op">=</span> <span class="va">work_dir</span>,</span>
+<span>  output_prefix <span class="op">=</span> <span class="st">"demo"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; Dependency analysis complete</span></span>
+<span><span class="co">#&gt; Format: csv</span></span>
+<span><span class="co">#&gt; Output: /tmp/Rtmpx56mGF/functracer-demo-1af9677fc472/demo_dependencies.csv</span></span>
+<span></span>
+<span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="va">output</span><span class="op">$</span><span class="va">output_path</span>, check.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="va">out</span></span>
 <span><span class="co">#&gt;    function dep_type hop_depth                             call_path  source</span></span>
 <span><span class="co">#&gt; 1   core_fn   direct         1                     main.R -&gt; core_fn demoPkg</span></span>

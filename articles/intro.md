@@ -6,7 +6,7 @@ This vignette shows the smallest useful workflow:
 2.  Point to a package source tree.
 3.  Run
     [`analyze_dependencies()`](https://ccbr.github.io/functracer/reference/analyze_dependencies.md).
-4.  Read the output files.
+4.  Optionally write one output artifact.
 
 ## Quick real-world call
 
@@ -15,14 +15,20 @@ library(functracer)
 
 result <- analyze_dependencies(
   entry_script = "path/to/main.R",
+  package_dir = "path/to/package-root"
+)
+
+result
+
+output <- trace_functions(
+  entry_script = "path/to/main.R",
   package_dir = "path/to/package-root",
+  output_format = "svg",
   output_dir = ".",
   output_prefix = "analysis"
 )
 
-result$csv
-result$json
-result$svg
+output$output_path
 ```
 
 ## Tiny self-contained example
@@ -82,26 +88,39 @@ writeLines(
 
 result <- analyze_dependencies(
   entry_script = entry_script,
-  package_dir = demo_pkg,
-  output_dir = work_dir,
-  output_prefix = "demo"
+  package_dir = demo_pkg
 )
 
-result[c("csv", "json", "svg")]
-#> $csv
-#> [1] "/tmp/RtmpKxnLwc/functracer-demo-1ddd122d4395/demo_dependencies.csv"
-#> 
-#> $json
-#> [1] "/tmp/RtmpKxnLwc/functracer-demo-1ddd122d4395/demo_dependencies.json"
-#> 
-#> $svg
-#> [1] "/tmp/RtmpKxnLwc/functracer-demo-1ddd122d4395/demo_dependencies.svg"
+result
+#>    function dep_type hop_depth                             call_path  source
+#> 1   core_fn   direct         1                     main.R -> core_fn demoPkg
+#> 2       run   direct         1                         main.R -> run  main.R
+#> 3   core_fn indirect         2              main.R -> run -> core_fn demoPkg
+#> 4 helper_fn indirect         2        main.R -> core_fn -> helper_fn demoPkg
+#> 5 helper_fn indirect         3 main.R -> run -> core_fn -> helper_fn demoPkg
+#>   is_exported
+#> 1        TRUE
+#> 2       FALSE
+#> 3        TRUE
+#> 4        TRUE
+#> 5        TRUE
 ```
 
 ## Inspect output data
 
 ``` r
-out <- read.csv(result$csv, check.names = FALSE)
+output <- trace_functions(
+  entry_script = entry_script,
+  package_dir = demo_pkg,
+  output_format = "csv",
+  output_dir = work_dir,
+  output_prefix = "demo"
+)
+#> Dependency analysis complete
+#> Format: csv
+#> Output: /tmp/Rtmpx56mGF/functracer-demo-1af9677fc472/demo_dependencies.csv
+
+out <- read.csv(output$output_path, check.names = FALSE)
 out
 #>    function dep_type hop_depth                             call_path  source
 #> 1   core_fn   direct         1                     main.R -> core_fn demoPkg

@@ -6,13 +6,7 @@ target package source directory.
 ## Usage
 
 ``` r
-analyze_dependencies(
-  entry_script,
-  package_dir,
-  package_name = NULL,
-  output_dir = ".",
-  output_prefix = NULL
-)
+analyze_dependencies(entry_script, package_dir, package_name = NULL)
 ```
 
 ## Arguments
@@ -29,14 +23,6 @@ analyze_dependencies(
 
   Optional package name. If `NULL`, inferred from `DESCRIPTION`.
 
-- output_dir:
-
-  Directory where output artifacts are written.
-
-- output_prefix:
-
-  Prefix for output files. Defaults to entry script stem.
-
 ## Value
 
-A list containing paths to output files and in-memory data frames.
+A data frame describing direct and transitive dependencies.

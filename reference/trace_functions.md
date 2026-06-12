@@ -1,6 +1,6 @@
-# Trace Functions and Print Output Paths
+# Trace Functions and Write One Output Format
 
-Trace Functions and Print Output Paths
+Trace Functions and Write One Output Format
 
 ## Usage
 
@@ -10,7 +10,8 @@ trace_functions(
   package_dir,
   package_name = NULL,
   output_dir = ".",
-  output_prefix = NULL
+  output_prefix = NULL,
+  output_format = c("csv", "json", "svg")
 )
 ```
 
@@ -36,7 +37,10 @@ trace_functions(
 
   Prefix for output files. Defaults to entry script stem.
 
+- output_format:
+
+  Output file format. One of `"csv"`, `"json"`, or `"svg"`.
+
 ## Value
 
-Invisibly returns the same list as
-[`analyze_dependencies()`](https://ccbr.github.io/functracer/reference/analyze_dependencies.md).
+Invisibly returns a list with output path and dependency data.
