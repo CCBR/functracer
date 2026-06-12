@@ -44,12 +44,18 @@ build_parser <- function() {
   parser$add_argument(
     "--output-dir",
     default = ".",
-    help = "Directory for CSV, JSON, and SVG output."
+    help = "Directory for the output artifact."
   )
   parser$add_argument(
     "--prefix",
     default = NULL,
     help = "Optional output filename prefix."
+  )
+  parser$add_argument(
+    "--output-format",
+    default = "csv",
+    choices = c("csv", "json", "svg"),
+    help = "Output format to write."
   )
 
   parser
@@ -79,6 +85,7 @@ trace_functions(
   entry_script = args$entry,
   package_dir = args[["package-dir"]],
   package_name = args[["package-name"]],
+  output_format = args[["output-format"]],
   output_dir = if (is.null(args[["output-dir"]])) "." else args[["output-dir"]],
   output_prefix = args$prefix
 )

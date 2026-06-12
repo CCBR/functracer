@@ -4,13 +4,7 @@
 \alias{analyze_dependencies}
 \title{Analyze Direct and Transitive R Function Dependencies}
 \usage{
-analyze_dependencies(
-  entry_script,
-  package_dir,
-  package_name = NULL,
-  output_dir = ".",
-  output_prefix = NULL
-)
+analyze_dependencies(entry_script, package_dir, package_name = NULL)
 }
 \arguments{
 \item{entry_script}{Path to the entry R script.}
@@ -20,13 +14,9 @@ analyze_dependencies(
 
 \item{package_name}{Optional package name. If \code{NULL}, inferred from
 \code{DESCRIPTION}.}
-
-\item{output_dir}{Directory where output artifacts are written.}
-
-\item{output_prefix}{Prefix for output files. Defaults to entry script stem.}
 }
 \value{
-A list containing paths to output files and in-memory data frames.
+A data frame describing direct and transitive dependencies.
 }
 \description{
 Build a dependency map starting from an entry script and tracing into a

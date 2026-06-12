@@ -2,14 +2,15 @@
 % Please edit documentation in R/api.R
 \name{trace_functions}
 \alias{trace_functions}
-\title{Trace Functions and Print Output Paths}
+\title{Trace Functions and Write One Output Format}
 \usage{
 trace_functions(
   entry_script,
   package_dir,
   package_name = NULL,
   output_dir = ".",
-  output_prefix = NULL
+  output_prefix = NULL,
+  output_format = c("csv", "json", "svg")
 )
 }
 \arguments{
@@ -24,10 +25,13 @@ trace_functions(
 \item{output_dir}{Directory where output artifacts are written.}
 
 \item{output_prefix}{Prefix for output files. Defaults to entry script stem.}
+
+\item{output_format}{Output file format. One of \code{"csv"}, \code{"json"}, or
+\code{"svg"}.}
 }
 \value{
-Invisibly returns the same list as \code{\link[=analyze_dependencies]{analyze_dependencies()}}.
+Invisibly returns a list with output path and dependency data.
 }
 \description{
-Trace Functions and Print Output Paths
+Trace Functions and Write One Output Format
 }

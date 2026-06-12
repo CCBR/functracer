@@ -19,7 +19,7 @@ This vignette shows the smallest useful workflow:
 1. Pick an entry script.
 2. Point to a package source tree.
 3. Run `analyze_dependencies()`.
-4. Read the output files.
+4. Optionally write one output artifact.
 
 ## Quick real-world call
 
@@ -28,14 +28,20 @@ library(functracer)
 
 result <- analyze_dependencies(
   entry_script = "path/to/main.R",
+  package_dir = "path/to/package-root"
+)
+
+result
+
+output <- trace_functions(
+  entry_script = "path/to/main.R",
   package_dir = "path/to/package-root",
+  output_format = "svg",
   output_dir = ".",
   output_prefix = "analysis"
 )
 
-result$csv
-result$json
-result$svg
+output$output_path
 ```
 
 ## Tiny self-contained example
@@ -95,18 +101,24 @@ writeLines(
 
 result <- analyze_dependencies(
   entry_script = entry_script,
-  package_dir = demo_pkg,
-  output_dir = work_dir,
-  output_prefix = "demo"
+  package_dir = demo_pkg
 )
 
-result[c("csv", "json", "svg")]
+result
 ```
 
 ## Inspect output data
 
 ```{r}
-out <- read.csv(result$csv, check.names = FALSE)
+output <- trace_functions(
+  entry_script = entry_script,
+  package_dir = demo_pkg,
+  output_format = "csv",
+  output_dir = work_dir,
+  output_prefix = "demo"
+)
+
+out <- read.csv(output$output_path, check.names = FALSE)
 out
 ```
 

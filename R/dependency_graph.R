@@ -78,52 +78,66 @@ trace_dependencies <- function(roots, dep_map, entry_label) {
 #' Render a dependency graph as SVG
 #'
 #' @param dep_rows Dependency rows returned by the traversal.
-#' @param dep_map Named list of direct dependencies.
-#' @param root_functions Root package functions connected to the entry script.
-#' @param entry_label Label used for the entry script node.
 #' @param output_path Path to the output SVG file.
 #'
 #' @return Invisibly returns `NULL`.
 #' @keywords internal
 #' @noRd
-create_dependency_graph <- function(
-  dep_rows,
-  dep_map,
-  root_functions,
-  entry_label,
-  output_path
-) {
-  edge_df <- data.frame(
-    from = character(),
-    to = character(),
-    stringsAsFactors = FALSE
-  )
+build_graph_edges <- function(dep_rows) {
+  edge_rows <- vector("list", 0)
 
-  for (fn in names(dep_map)) {
-    deps <- dep_map[[fn]]
-    if (length(deps) == 0) {
-      next
-    }
-    edge_df <- rbind(
-      edge_df,
-      data.frame(from = fn, to = deps, stringsAsFactors = FALSE)
+  if (nrow(dep_rows) == 0) {
+    edge_df <- data.frame(
+      from = character(),
+      to = character(),
+      stringsAsFactors = FALSE
     )
+    return(edge_df)
   }
 
-  reachable_nodes <- unique(c(entry_label, dep_rows[["function"]]))
-  root_edges <- data.frame(
-    from = rep(entry_label, length(root_functions)),
-    to = root_functions,
-    stringsAsFactors = FALSE
-  )
-  edge_df <- rbind(edge_df, root_edges)
-  edge_df <- edge_df[
-    edge_df$from %in% reachable_nodes | edge_df$from == entry_label,
-    ,
-    drop = FALSE
-  ]
-  edge_df <- edge_df[edge_df$to %in% reachable_nodes, , drop = FALSE]
-  edge_df <- unique(edge_df)
+  for (call_path in dep_rows$call_path) {
+    path_nodes <- strsplit(call_path, " -> ", fixed = TRUE)[[1]]
+    if (length(path_nodes) < 2) {
+      next
+    }
+
+    for (idx in seq_len(length(path_nodes) - 1)) {
+      edge_rows[[length(edge_rows) + 1]] <- data.frame(
+        from = path_nodes[[idx]],
+        to = path_nodes[[idx + 1]],
+        stringsAsFactors = FALSE
+      )
+    }
+  }
+
+  if (length(edge_rows) == 0) {
+    edge_df <- data.frame(
+      from = character(),
+      to = character(),
+      stringsAsFactors = FALSE
+    )
+  } else {
+    edge_df <- unique(do.call(rbind, edge_rows))
+  }
+
+  edge_df
+}
+
+#' Render a dependency graph as SVG
+#'
+#' @param dep_rows Dependency rows returned by the traversal.
+#' @param output_path Path to the output SVG file.
+#'
+#' @return Invisibly returns `NULL`.
+#' @keywords internal
+#' @noRd
+create_dependency_graph <- function(dep_rows, output_path) {
+  edge_df <- build_graph_edges(dep_rows)
+  entry_label <- if (nrow(dep_rows) == 0) {
+    "entry"
+  } else {
+    strsplit(dep_rows$call_path[[1]], " -> ", fixed = TRUE)[[1]][[1]]
+  }
 
   if (nrow(edge_df) == 0) {
     grDevices::svg(output_path, width = 10, height = 7)

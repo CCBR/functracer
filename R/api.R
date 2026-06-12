@@ -8,21 +8,16 @@
 #'   `NAMESPACE`.
 #' @param package_name Optional package name. If `NULL`, inferred from
 #'   `DESCRIPTION`.
-#' @param output_dir Directory where output artifacts are written.
-#' @param output_prefix Prefix for output files. Defaults to entry script stem.
 #'
-#' @return A list containing paths to output files and in-memory data frames.
+#' @return A data frame describing direct and transitive dependencies.
 #' @export
 analyze_dependencies <- function(
   entry_script,
   package_dir,
-  package_name = NULL,
-  output_dir = ".",
-  output_prefix = NULL
+  package_name = NULL
 ) {
   entry_script <- normalizePath(entry_script, winslash = "/", mustWork = FALSE)
   package_dir <- normalizePath(package_dir, winslash = "/", mustWork = FALSE)
-  output_dir <- normalizePath(output_dir, winslash = "/", mustWork = FALSE)
 
   package_r_dir <- file.path(package_dir, "R")
   namespace_file <- file.path(package_dir, "NAMESPACE")
@@ -44,27 +39,6 @@ analyze_dependencies <- function(
   if (is.null(package_name)) {
     package_name <- infer_package_name(description_file)
   }
-
-  if (is.null(output_prefix) || identical(output_prefix, "")) {
-    output_prefix <- tools::file_path_sans_ext(basename(entry_script))
-  }
-
-  if (!dir.exists(output_dir)) {
-    dir.create(output_dir, recursive = TRUE)
-  }
-
-  output_csv <- file.path(
-    output_dir,
-    paste0(output_prefix, "_dependencies.csv")
-  )
-  output_json <- file.path(
-    output_dir,
-    paste0(output_prefix, "_dependencies.json")
-  )
-  output_svg <- file.path(
-    output_dir,
-    paste0(output_prefix, "_dependencies.svg")
-  )
 
   exported_functions <- extract_exported_functions(namespace_file)
 
@@ -137,70 +111,115 @@ analyze_dependencies <- function(
     rownames(transitive_df) <- NULL
   }
 
-  readr::write_csv(transitive_df, output_csv)
+  transitive_df
+}
 
-  json_payload <- list(
-    metadata = list(
-      generated_at = as.character(Sys.time()),
-      parser = direct_calls_result$parser_used,
-      entry_script = entry_script,
-      package_dir = package_dir,
-      package_name = package_name,
-      roots = roots
-    ),
-    direct_calls = direct_calls,
-    dependencies_by_depth = split(transitive_df, transitive_df$hop_depth)
-  )
+#' Write dependency data as CSV
+#'
+#' @param dependencies A dependency data frame from [analyze_dependencies()].
+#' @param output_path Path to the output CSV file.
+#'
+#' @return The output path, invisibly.
+#' @keywords internal
+#' @noRd
+write_dependencies_csv <- function(dependencies, output_path) {
+  readr::write_csv(dependencies, output_path)
+  invisible(output_path)
+}
 
+#' Write dependency data as JSON
+#'
+#' @param dependencies A dependency data frame from [analyze_dependencies()].
+#' @param output_path Path to the output JSON file.
+#'
+#' @return The output path, invisibly.
+#' @keywords internal
+#' @noRd
+write_dependencies_json <- function(dependencies, output_path) {
   jsonlite::write_json(
-    json_payload,
-    output_json,
+    dependencies,
+    output_path,
     auto_unbox = TRUE,
     pretty = TRUE
   )
 
-  create_dependency_graph(
-    dep_rows = transitive_df,
-    dep_map = dep_map,
-    root_functions = roots,
-    entry_label = basename(entry_script),
-    output_path = output_svg
-  )
-
-  list(
-    csv = output_csv,
-    json = output_json,
-    svg = output_svg,
-    roots = roots,
-    direct_calls = direct_calls,
-    dependencies = transitive_df
-  )
+  invisible(output_path)
 }
 
-#' Trace Functions and Print Output Paths
+#' Write dependency data as SVG graph
+#'
+#' @param dependencies A dependency data frame from [analyze_dependencies()].
+#' @param output_path Path to the output SVG file.
+#'
+#' @return The output path, invisibly.
+#' @keywords internal
+#' @noRd
+write_dependencies_svg <- function(dependencies, output_path) {
+  create_dependency_graph(dep_rows = dependencies, output_path = output_path)
+  invisible(output_path)
+}
+
+#' Trace Functions and Write One Output Format
 #'
 #' @inheritParams analyze_dependencies
-#' @return Invisibly returns the same list as [analyze_dependencies()].
+#' @param output_dir Directory where output artifacts are written.
+#' @param output_prefix Prefix for output files. Defaults to entry script stem.
+#' @param output_format Output file format. One of `"csv"`, `"json"`, or
+#'   `"svg"`.
+#'
+#' @return Invisibly returns a list with output path and dependency data.
 #' @export
 trace_functions <- function(
   entry_script,
   package_dir,
   package_name = NULL,
   output_dir = ".",
-  output_prefix = NULL
+  output_prefix = NULL,
+  output_format = c("csv", "json", "svg")
 ) {
-  result <- analyze_dependencies(
+  output_format <- match.arg(output_format)
+
+  dependencies <- analyze_dependencies(
     entry_script = entry_script,
     package_dir = package_dir,
-    package_name = package_name,
-    output_dir = output_dir,
-    output_prefix = output_prefix
+    package_name = package_name
   )
 
-  message("Dependency analysis complete")
-  message("CSV: ", result$csv)
-  message("JSON: ", result$json)
-  message("SVG: ", result$svg)
+  if (is.null(output_prefix) || identical(output_prefix, "")) {
+    output_prefix <- tools::file_path_sans_ext(basename(entry_script))
+  }
 
-  invisible(result)
+  output_dir <- normalizePath(output_dir, winslash = "/", mustWork = FALSE)
+  if (!dir.exists(output_dir)) {
+    dir.create(output_dir, recursive = TRUE)
+  }
+
+  extension <- switch(
+    output_format,
+    csv = "csv",
+    json = "json",
+    svg = "svg"
+  )
+  output_path <- file.path(
+    output_dir,
+    paste0(output_prefix, "_dependencies.", extension)
+  )
+
+  if (output_format == "csv") {
+    write_dependencies_csv(dependencies, output_path)
+  } else if (output_format == "json") {
+    write_dependencies_json(dependencies, output_path)
+  } else {
+    write_dependencies_svg(dependencies, output_path)
+  }
+
+  message("Dependency analysis complete")
+  message("Format: ", output_format)
+  message("Output: ", output_path)
+
+  invisible(list(
+    output_path = output_path,
+    output_format = output_format,
+    dependencies = dependencies
+  ))
 }
