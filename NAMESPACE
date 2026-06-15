@@ -2,3 +2,4 @@
 
 export(analyze_dependencies)
 export(trace_functions)
+export(trace_release_impact)

@@ -1,4 +1,4 @@
-#' Analyze Direct and Transitive R Function Dependencies
+#' Collect direct and transitive R function dependencies
 #'
 #' Build a dependency map starting from an entry script and tracing into a
 #' target package source directory.
@@ -9,9 +9,10 @@
 #' @param package_name Optional package name. If `NULL`, inferred from
 #'   `DESCRIPTION`.
 #'
-#' @return A data frame describing direct and transitive dependencies.
-#' @export
-analyze_dependencies <- function(
+#' @return A list containing the dependency data frame and package metadata.
+#' @keywords internal
+#' @noRd
+collect_dependency_analysis <- function(
   entry_script,
   package_dir,
   package_name = NULL
@@ -111,7 +112,37 @@ analyze_dependencies <- function(
     rownames(transitive_df) <- NULL
   }
 
-  transitive_df
+  return(list(
+    dependencies = transitive_df,
+    package_name = package_name,
+    exported_functions = exported_functions,
+    function_files = pkg_map_result$function_files,
+    entry_local_functions = entry_local_functions,
+    known_package_functions = known_package_functions
+  ))
+}
+
+#' Analyze Direct and Transitive R Function Dependencies
+#'
+#' Build a dependency map starting from an entry script and tracing into a
+#' target package source directory.
+#'
+#' @inheritParams collect_dependency_analysis
+#'
+#' @return A data frame describing direct and transitive dependencies.
+#' @export
+analyze_dependencies <- function(
+  entry_script,
+  package_dir,
+  package_name = NULL
+) {
+  return(
+    collect_dependency_analysis(
+      entry_script = entry_script,
+      package_dir = package_dir,
+      package_name = package_name
+    )$dependencies
+  )
 }
 
 #' Write dependency data as CSV
@@ -124,7 +155,7 @@ analyze_dependencies <- function(
 #' @noRd
 write_dependencies_csv <- function(dependencies, output_path) {
   readr::write_csv(dependencies, output_path)
-  invisible(output_path)
+  return(invisible(output_path))
 }
 
 #' Write dependency data as JSON
@@ -143,7 +174,7 @@ write_dependencies_json <- function(dependencies, output_path) {
     pretty = TRUE
   )
 
-  invisible(output_path)
+  return(invisible(output_path))
 }
 
 #' Write dependency data as SVG graph
@@ -156,7 +187,7 @@ write_dependencies_json <- function(dependencies, output_path) {
 #' @noRd
 write_dependencies_svg <- function(dependencies, output_path) {
   create_dependency_graph(dep_rows = dependencies, output_path = output_path)
-  invisible(output_path)
+  return(invisible(output_path))
 }
 
 #' Trace Functions and Write One Output Format
@@ -217,9 +248,9 @@ trace_functions <- function(
   message("Format: ", output_format)
   message("Output: ", output_path)
 
-  invisible(list(
+  return(invisible(list(
     output_path = output_path,
     output_format = output_format,
     dependencies = dependencies
-  ))
+  )))
 }
