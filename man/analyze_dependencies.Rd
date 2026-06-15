@@ -6,6 +6,15 @@
 \usage{
 analyze_dependencies(entry_script, package_dir, package_name = NULL)
 }
+\arguments{
+\item{entry_script}{Path to the entry R script.}
+
+\item{package_dir}{Path to a package root directory containing \verb{R/} and
+\code{NAMESPACE}.}
+
+\item{package_name}{Optional package name. If \code{NULL}, inferred from
+\code{DESCRIPTION}.}
+}
 \value{
 A data frame describing direct and transitive dependencies.
 }
