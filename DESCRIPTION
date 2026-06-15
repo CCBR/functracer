@@ -30,7 +30,7 @@ Suggests:
     argparse,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
-Config/Needs/dev: covr, here, lintr, pkgdown, rcmdcheck
+Config/Needs/dev: cffr, covr, here, lintr, pkgdown, rcmdcheck
 VignetteBuilder:
     knitr
 Encoding: UTF-8
