@@ -12,3 +12,6 @@
 ^\.pre-commit-config\.yaml$
 ^air\.toml$
 ^_pkgdown\.yml$
+^README\.html$
+^codemeta\.json$
+^CITATION\.cff$
