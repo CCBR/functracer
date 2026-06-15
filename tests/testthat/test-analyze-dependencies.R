@@ -101,14 +101,15 @@ build_release_dependency_fixture <- function() {
   on.exit(setwd(old_wd), add = TRUE)
 
   run_fixture_git <- function(args) {
-    output <- system2("git", args, stdout = TRUE, stderr = TRUE)
+    cmd <- paste(c("git", shQuote(args)), collapse = " ")
+    output <- system(cmd, intern = TRUE, ignore.stderr = FALSE)
     exit_code <- attr(output, "status")
 
     if (!is.null(exit_code) && exit_code != 0) {
       stop(
         paste0(
-          "Fixture git command failed: git ",
-          paste(args, collapse = " "),
+          "Fixture git command failed: ",
+          cmd,
           "\n",
           paste(output, collapse = "\n")
         )
@@ -293,14 +294,15 @@ test_that("resolve_previous_release_tag identifies correct previous tag", {
   on.exit(setwd(old_wd), add = TRUE)
 
   run_tag_test_git <- function(args) {
-    output <- system2("git", args, stdout = TRUE, stderr = TRUE)
+    cmd <- paste(c("git", shQuote(args)), collapse = " ")
+    output <- system(cmd, intern = TRUE, ignore.stderr = FALSE)
     exit_code <- attr(output, "status")
 
     if (!is.null(exit_code) && exit_code != 0) {
       stop(
         paste0(
-          "Test git command failed: git ",
-          paste(args, collapse = " "),
+          "Test git command failed: ",
+          cmd,
           "\n",
           paste(output, collapse = "\n")
         )
