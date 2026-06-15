@@ -1,24 +1,28 @@
 # functracer
 
-Trace direct and transitive function dependencies for an R entry script
+Trace direct and transitive function dependencies for an R script
 against a target package source tree.
 
 ## Features
 
-- Extract direct function calls from an entry script.
+- Extract direct function calls from an R script.
 - Build package function adjacency from `R/` source files.
 - Traverse transitive dependencies and retain call paths.
+- Compare a tagged GitHub release against the previous tag and flag
+  traced dependencies that changed.
 - Export dependency artifacts as CSV, JSON, and SVG.
 - Supports regular function assignments and S7 generics/methods.
 
-## Install (local)
+## Installation
 
 ``` r
-# from the repository root
-install.packages(".", repos = NULL, type = "source")
+# install.packages("remotes")
+remotes::install_github("CCBR/functracer")
 ```
 
-## Programmatic usage
+## Usage
+
+### R
 
 ``` r
 library(functracer)
@@ -39,9 +43,18 @@ output <- trace_functions(
 )
 
 output$output_path
+
+release_result <- trace_release_impact(
+  entry_script = "path/to/main.R",
+  repository = "https://github.com/owner/package.git",
+  release_tag = "v1.2.0"
+)
+
+release_result$script_affected
+release_result$changed_dependencies
 ```
 
-## CLI usage
+### CLI
 
 ``` sh
 Rscript inst/scripts/functracer.R \
@@ -50,9 +63,17 @@ Rscript inst/scripts/functracer.R \
   --output-format json \
   --output-dir . \
   --prefix analysis
+
+Rscript inst/scripts/functracer.R \
+  --entry path/to/main.R \
+  --repo-url https://github.com/owner/package.git \
+  --release-tag v1.2.0 \
+  --output-format json \
+  --output-dir . \
+  --prefix release-analysis
 ```
 
-## Output schema
+### Output schema
 
 CSV includes:
 

@@ -56,30 +56,34 @@
   <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header"><h1 id="functracer">functracer<a class="anchor" aria-label="anchor" href="#functracer"></a>
 </h1></div>
-<p>Trace direct and transitive function dependencies for an R entry script against a target package source tree.</p>
+<p>Trace direct and transitive function dependencies for an R script against a target package source tree.</p>
 <!-- badges: start -->
 
 <div class="section level2">
 <h2 id="features">Features<a class="anchor" aria-label="anchor" href="#features"></a>
 </h2>
 <ul>
-<li>Extract direct function calls from an entry script.</li>
+<li>Extract direct function calls from an R script.</li>
 <li>Build package function adjacency from <code>R/</code> source files.</li>
 <li>Traverse transitive dependencies and retain call paths.</li>
+<li>Compare a tagged GitHub release against the previous tag and flag traced dependencies that changed.</li>
 <li>Export dependency artifacts as CSV, JSON, and SVG.</li>
 <li>Supports regular function assignments and S7 generics/methods.</li>
 </ul>
 </div>
 <div class="section level2">
-<h2 id="install-local">Install (local)<a class="anchor" aria-label="anchor" href="#install-local"></a>
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># from the repository root</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"."</span>, repos <span class="op">=</span> <span class="cn">NULL</span>, type <span class="op">=</span> <span class="st">"source"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"CCBR/functracer"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="programmatic-usage">Programmatic usage<a class="anchor" aria-label="anchor" href="#programmatic-usage"></a>
+<h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
 </h2>
+<div class="section level3">
+<h3 id="r">R<a class="anchor" aria-label="anchor" href="#r"></a>
+</h3>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/CCBR/functracer" class="external-link">functracer</a></span><span class="op">)</span></span>
 <span></span>
@@ -98,21 +102,38 @@
 <span>  output_prefix <span class="op">=</span> <span class="st">"analysis"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">output</span><span class="op">$</span><span class="va">output_path</span></span></code></pre></div>
+<span><span class="va">output</span><span class="op">$</span><span class="va">output_path</span></span>
+<span></span>
+<span><span class="va">release_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/trace_release_impact.html">trace_release_impact</a></span><span class="op">(</span></span>
+<span>  entry_script <span class="op">=</span> <span class="st">"path/to/main.R"</span>,</span>
+<span>  repository <span class="op">=</span> <span class="st">"https://github.com/owner/package.git"</span>,</span>
+<span>  release_tag <span class="op">=</span> <span class="st">"v1.2.0"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">release_result</span><span class="op">$</span><span class="va">script_affected</span></span>
+<span><span class="va">release_result</span><span class="op">$</span><span class="va">changed_dependencies</span></span></code></pre></div>
 </div>
-<div class="section level2">
-<h2 id="cli-usage">CLI usage<a class="anchor" aria-label="anchor" href="#cli-usage"></a>
-</h2>
+<div class="section level3">
+<h3 id="cli">CLI<a class="anchor" aria-label="anchor" href="#cli"></a>
+</h3>
 <div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="ex">Rscript</span> inst/scripts/functracer.R <span class="dt">\</span></span>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>  <span class="at">--entry</span> path/to/main.R <span class="dt">\</span></span>
 <span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  <span class="at">--package-dir</span> path/to/package-root <span class="dt">\</span></span>
 <span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  <span class="at">--output-format</span> json <span class="dt">\</span></span>
 <span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>  <span class="at">--output-dir</span> . <span class="dt">\</span></span>
-<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>  <span class="at">--prefix</span> analysis</span></code></pre></div>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>  <span class="at">--prefix</span> analysis</span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="ex">Rscript</span> inst/scripts/functracer.R <span class="dt">\</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>  <span class="at">--entry</span> path/to/main.R <span class="dt">\</span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>  <span class="at">--repo-url</span> https://github.com/owner/package.git <span class="dt">\</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>  <span class="at">--release-tag</span> v1.2.0 <span class="dt">\</span></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>  <span class="at">--output-format</span> json <span class="dt">\</span></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a>  <span class="at">--output-dir</span> . <span class="dt">\</span></span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a>  <span class="at">--prefix</span> release-analysis</span></code></pre></div>
 </div>
-<div class="section level2">
-<h2 id="output-schema">Output schema<a class="anchor" aria-label="anchor" href="#output-schema"></a>
-</h2>
+<div class="section level3">
+<h3 id="output-schema">Output schema<a class="anchor" aria-label="anchor" href="#output-schema"></a>
+</h3>
 <p>CSV includes:</p>
 <ul>
 <li><code>function</code></li>
@@ -123,6 +144,7 @@
 <li><code>source</code></li>
 <li><code>is_exported</code></li>
 </ul>
+</div>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">

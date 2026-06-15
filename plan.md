@@ -62,7 +62,7 @@ colored by depth for visual impact analysis
 - **Parser**: Start with `treesitter` for speed; fallback to base R
   [`parse()`](https://rdrr.io/r/base/parse.html) if needed
 - **Scope**: Analyze MOSuite only (not other packages) for focused
-  impact analysis  
+  impact analysis
 - **Recursion**: Follow to completion (no depth limit; will converge)
 - **Artifacts**: Save outputs as
   `venn_diagram_dependencies.{csv,json,svg}` in
