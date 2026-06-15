@@ -46,7 +46,7 @@
 ### Key Decisions
 
 - **Parser**: Start with `treesitter` for speed; fallback to base R `parse()` if needed
-- **Scope**: Analyze MOSuite only (not other packages) for focused impact analysis  
+- **Scope**: Analyze MOSuite only (not other packages) for focused impact analysis
 - **Recursion**: Follow to completion (no depth limit; will converge)
 - **Artifacts**: Save outputs as `venn_diagram_dependencies.{csv,json,svg}` in MOSuite-plot-venn-diagram directory
 

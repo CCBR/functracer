@@ -28,15 +28,16 @@ trace_release_impact(
 
 \item{output_dir}{Directory where output artifacts are written.}
 
-\item{output_prefix}{Prefix for output files. Defaults to the entry script stem.}
+\item{output_prefix}{Prefix for output files. Defaults to entry script stem.}
 
-\item{output_format}{Output file format. One of \code{"csv"}, \code{"json"}, or \code{"svg"}.}
+\item{output_format}{Output file format. One of \code{"csv"}, \code{"json"}, or
+\code{"svg"}.}
 }
 \value{
-Invisibly returns a list with the output path, dependency data, changed files,
-changed dependencies, and release metadata.
+Invisibly returns a list with output path, dependency data, and
+release impact metadata.
 }
 \description{
-Clone a git repository, check out a release tag, compare it to the previous tag,
-and identify traced dependencies whose source files changed in the new release.
+Clone a git repository, check out the requested release tag, compare it to
+the previous tag, and identify traced dependencies whose source files changed.
 }
