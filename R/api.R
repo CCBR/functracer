@@ -127,7 +127,11 @@ collect_dependency_analysis <- function(
 #' Build a dependency map starting from an entry script and tracing into a
 #' target package source directory.
 #'
-#' @inheritParams collect_dependency_analysis
+#' @param entry_script Path to the entry R script.
+#' @param package_dir Path to a package root directory containing `R/` and
+#'   `NAMESPACE`.
+#' @param package_name Optional package name. If `NULL`, inferred from
+#'   `DESCRIPTION`.
 #'
 #' @return A data frame describing direct and transitive dependencies.
 #' @export
