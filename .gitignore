@@ -4,3 +4,4 @@
 .pixi/*
 !.pixi/config.toml
 /README.html
+/.posit/
