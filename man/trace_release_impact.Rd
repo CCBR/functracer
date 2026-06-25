@@ -18,7 +18,7 @@ trace_release_impact(
 \arguments{
 \item{entry_script}{Path to the entry R script.}
 
-\item{repository}{GitHub repository URL or local git repository path.}
+\item{repository}{GitHub repository URL or local git repository path containing a tagged package release.}
 
 \item{release_tag}{Release tag to analyze.}
 
