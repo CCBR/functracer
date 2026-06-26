@@ -20,6 +20,7 @@ RUN mamba install -y -c conda-forge \
     r-jsonlite \
     r-knitr \
     r-lintr \
+    r-pak \
     r-readr \
     r-rmarkdown \
     r-roxygen2 \

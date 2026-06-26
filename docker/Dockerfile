@@ -16,6 +16,7 @@ RUN mamba install -y -c conda-forge \
     r-base=${R_VERSION} \
     r-argparse \
     r-covr \
+    r-devtools \
     r-igraph \
     r-jsonlite \
     r-knitr \
