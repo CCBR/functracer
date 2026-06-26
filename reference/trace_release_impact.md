@@ -27,7 +27,8 @@ trace_release_impact(
 
 - repository:
 
-  GitHub repository URL or local git repository path.
+  GitHub repository URL or local git repository path containing a tagged
+  package release.
 
 - release_tag:
 
