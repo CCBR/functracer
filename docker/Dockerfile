@@ -16,7 +16,6 @@ RUN mamba install -y -c conda-forge \
     r-base=${R_VERSION} \
     r-argparse \
     r-covr \
-    r-grDevices \
     r-igraph \
     r-jsonlite \
     r-knitr \
@@ -25,8 +24,6 @@ RUN mamba install -y -c conda-forge \
     r-rmarkdown \
     r-roxygen2 \
     r-testthat \
-    r-treesitter \
-    r-treesitter.r \
   && conda clean -afy
 
 # install R package
