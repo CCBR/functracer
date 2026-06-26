@@ -1,0 +1,38 @@
+FROM nciccbr/ccbr_ubuntu_24.04:v1
+
+# build time variables
+ARG BUILD_DATE="000000"
+ENV BUILD_DATE=${BUILD_DATE}
+ARG BUILD_TAG="000000"
+ENV BUILD_TAG=${BUILD_TAG}
+ARG REPONAME="000000"
+ENV REPONAME=${REPONAME}
+
+ARG R_VERSION=4.5
+ENV R_VERSION=${R_VERSION}
+
+# install conda packages
+RUN mamba install -y -c conda-forge \
+    r-base=${R_VERSION} \
+    r-argparse \
+    r-covr \
+    r-igraph \
+    r-jsonlite \
+    r-knitr \
+    r-lintr \
+    r-readr \
+    r-rmarkdown \
+    r-roxygen2 \
+    r-testthat \
+  && conda clean -afy
+
+# install dependencies, but not the R package itself
+# using --mount avoids copying the context into the image
+RUN --mount=type=bind,source=.,target=/opt2/functracer \
+    R -e "pak::local_install_dev_deps('/opt2/functracer', upgrade=FALSE)" && \
+    R -s -e "readr::write_csv(tibble::as_tibble(installed.packages()), '/data2/r-packages_functracer-minimal.csv')"
+
+# cleanup
+WORKDIR /data2
+RUN apt-get clean && apt-get purge \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
