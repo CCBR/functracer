@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PKG_DIR="$(dirname "${SCRIPT_DIR}")"
+
+# In the source repo: inst/scripts/functracer.R
+# In an installed package: scripts/functracer.R (R strips inst/ on install)
+if [[ -f "${PKG_DIR}/inst/scripts/functracer.R" ]]; then
+  R_SCRIPT="${PKG_DIR}/inst/scripts/functracer.R"
+else
+  R_SCRIPT="${PKG_DIR}/scripts/functracer.R"
+fi
+
+Rscript "${R_SCRIPT}" "$@"

@@ -119,7 +119,7 @@ lookup_dependency_source_files <- function(dependency_names, function_files) {
 #' the previous tag, and identify traced dependencies whose source files changed.
 #'
 #' @param entry_script Path to the entry R script.
-#' @param repository GitHub repository URL or local git repository path.
+#' @param repository GitHub repository URL or local git repository path containing a tagged package release.
 #' @param release_tag Release tag to analyze.
 #' @param package_name Optional package name override.
 #' @param previous_tag Optional previous tag override.
