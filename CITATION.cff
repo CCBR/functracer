@@ -8,7 +8,7 @@ message: 'To cite package "functracer" in publications use:'
 type: software
 license: MIT
 title: 'functracer: Trace Function Dependencies in R Code'
-version: 0.1.0
+version: 0.1.0.9000
 abstract: Build direct and transitive function dependency graphs from an R entry script
   and a target package source tree. Exports machine-readable and human-readable artifacts
   (CSV, JSON, SVG) for analysis.
@@ -31,10 +31,13 @@ references:
   url: https://www.R-project.org/
   authors:
   - name: R Core Team
+    website: https://ror.org/02zz1nj61
   institution:
     name: R Foundation for Statistical Computing
+    website: https://ror.org/05qewa988
     address: Vienna, Austria
   year: '2026'
+  doi: 10.32614/R.manuals
   version: '>= 4.1.0'
 - type: software
   title: grDevices
@@ -42,10 +45,13 @@ references:
   notes: Imports
   authors:
   - name: R Core Team
+    website: https://ror.org/02zz1nj61
   institution:
     name: R Foundation for Statistical Computing
+    website: https://ror.org/05qewa988
     address: Vienna, Austria
   year: '2026'
+  doi: 10.32614/R.manuals
 - type: software
   title: igraph
   abstract: 'igraph: Network Analysis and Visualization'
