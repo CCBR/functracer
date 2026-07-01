@@ -1,4 +1,3 @@
-
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # functracer
@@ -9,7 +8,7 @@ against a target package source tree.
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/CCBR/functracer/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/CCBR/functracer/actions/workflows/R-CMD-check.yaml)
-[![test-coverage](https://github.com/CCBR/functracer/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/CCBR/functracer/actions/workflows/test-coverage.yaml)
+[![codecov](https://codecov.io/gh/CCBR/functracer/graph/badge.svg?token=5BLOfOM2Z8)](https://codecov.io/gh/CCBR/functracer)
 <!-- badges: end -->
 
 ## Features
