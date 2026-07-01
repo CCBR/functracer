@@ -43,4 +43,49 @@ trace_functions(
 
 ## Value
 
-Invisibly returns a list with output path and dependency data.
+Invisibly returns a list with: `output_path` (artifact path),
+`output_format` (selected format), and `dependencies` (the same data
+frame returned by
+[`analyze_dependencies()`](https://ccbr.github.io/functracer/reference/analyze_dependencies.md)).
+
+## Examples
+
+``` r
+temp_root <- tempfile("functracer-example-")
+dir.create(temp_root)
+pkg_dir <- file.path(temp_root, "demoPkg")
+dir.create(pkg_dir)
+dir.create(file.path(pkg_dir, "R"))
+writeLines(
+  c(
+    "Package: demoPkg",
+    "Version: 0.0.1",
+    "Title: Demo Package",
+    "Description: Demo package for examples.",
+    "License: MIT"
+  ),
+  file.path(pkg_dir, "DESCRIPTION")
+)
+writeLines("export(core_fn)", file.path(pkg_dir, "NAMESPACE"))
+writeLines(
+  c(
+    "core_fn <- function(x) {",
+    "  x + 1",
+    "}"
+  ),
+  file.path(pkg_dir, "R", "core.R")
+)
+entry_script <- file.path(temp_root, "main.R")
+writeLines("core_fn(3)", entry_script)
+out <- trace_functions(
+  entry_script = entry_script,
+  package_dir = pkg_dir,
+  output_dir = temp_root,
+  output_format = "json"
+)
+#> Dependency analysis complete
+#> Format: json
+#> Output: /tmp/RtmpT3WTPp/functracer-example-1acb52cf2102/main_dependencies.json
+file.exists(out$output_path)
+#> [1] TRUE
+```

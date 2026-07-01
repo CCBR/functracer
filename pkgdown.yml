@@ -3,7 +3,7 @@ pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
   intro: intro.html
-last_built: 2026-07-01T17:08Z
+last_built: 2026-07-01T18:23Z
 urls:
   reference: https://ccbr.github.io/functracer/reference
   article: https://ccbr.github.io/functracer/articles

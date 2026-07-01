@@ -118,7 +118,7 @@ output <- trace_functions(
 )
 #> Dependency analysis complete
 #> Format: csv
-#> Output: /tmp/RtmpgjlgQc/functracer-demo-1c0c37c29d97/demo_dependencies.csv
+#> Output: /tmp/RtmpMslMLV/functracer-demo-1baa5a71acb8/demo_dependencies.csv
 
 out <- read.csv(output$output_path, check.names = FALSE)
 out
@@ -135,6 +135,29 @@ out
 #> 4        TRUE
 #> 5        TRUE
 ```
+
+## Release impact analysis
+
+Use
+[`trace_release_impact()`](https://ccbr.github.io/functracer/reference/trace_release_impact.md)
+when you want to check whether functions in the traced dependency graph
+changed between tags.
+
+``` r
+release_result <- trace_release_impact(
+  entry_script = "path/to/main.R",
+  repository = "https://github.com/owner/package.git",
+  release_tag = "v1.2.0",
+  package_subdir = "packages/myPkg"
+)
+
+release_result$script_affected
+release_result$changed_dependencies
+```
+
+`script_affected` is `TRUE` when at least one traced dependency comes
+from an R source file that changed between the inferred `previous_tag`
+(or an explicit `previous_tag`) and `release_tag`.
 
 ## Interpretation
 
