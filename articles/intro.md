@@ -118,7 +118,7 @@ output <- trace_functions(
 )
 #> Dependency analysis complete
 #> Format: csv
-#> Output: /tmp/Rtmp0TBCPh/functracer-demo-1a962be71f91/demo_dependencies.csv
+#> Output: /tmp/RtmpgjlgQc/functracer-demo-1c0c37c29d97/demo_dependencies.csv
 
 out <- read.csv(output$output_path, check.names = FALSE)
 out
