@@ -37,10 +37,77 @@ trace_release_impact(
 \code{"svg"}.}
 }
 \value{
-Invisibly returns a list with output path, dependency data, and
-release impact metadata.
+Invisibly returns a list with:
+\code{output_path}, \code{output_format}, \code{dependencies}, \code{changed_dependencies},
+\code{changed_files}, \code{release_tag}, \code{previous_tag}, \code{repository}, and
+\code{script_affected}.
 }
 \description{
 Clone a git repository, check out the requested release tag, compare it to
 the previous tag, and identify traced dependencies whose source files changed.
+}
+\examples{
+\dontrun{
+temp_root <- tempfile("functracer-release-example-")
+dir.create(temp_root)
+
+repo_dir <- file.path(temp_root, "demo-repo")
+dir.create(repo_dir)
+dir.create(file.path(repo_dir, "R"))
+
+writeLines(
+  c(
+    "Package: demoPkg",
+    "Version: 0.0.1",
+    "Title: Demo Package",
+    "Description: Demo package for release examples.",
+    "License: MIT"
+  ),
+  file.path(repo_dir, "DESCRIPTION")
+)
+writeLines("export(core_fn)", file.path(repo_dir, "NAMESPACE"))
+writeLines(
+  c(
+    "core_fn <- function(x) {",
+    "  x + 1",
+    "}"
+  ),
+  file.path(repo_dir, "R", "core.R")
+)
+
+old_wd <- getwd()
+setwd(repo_dir)
+on.exit(setwd(old_wd), add = TRUE)
+system("git init --quiet")
+system("git config user.email 'example@example.com'")
+system("git config user.name 'Example User'")
+system("git add DESCRIPTION NAMESPACE R/core.R")
+system("git commit -m 'initial release' --quiet")
+system("git tag v0.1.0")
+
+writeLines(
+  c(
+    "core_fn <- function(x) {",
+    "  x + 2",
+    "}"
+  ),
+  file.path(repo_dir, "R", "core.R")
+)
+system("git add R/core.R")
+system("git commit -m 'update core' --quiet")
+system("git tag v0.2.0")
+
+entry_script <- file.path(temp_root, "main.R")
+writeLines("core_fn(3)", entry_script)
+
+out <- trace_release_impact(
+  entry_script = entry_script,
+  repository = repo_dir,
+  release_tag = "v0.2.0",
+  previous_tag = "v0.1.0",
+  output_dir = temp_root,
+  output_format = "csv"
+)
+out$script_affected
+}
 }
