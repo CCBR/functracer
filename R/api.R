@@ -133,7 +133,38 @@ collect_dependency_analysis <- function(
 #' @param package_name Optional package name. If `NULL`, inferred from
 #'   `DESCRIPTION`.
 #'
-#' @return A data frame describing direct and transitive dependencies.
+#' @return A data frame with one row per traced function and columns:
+#'   `function`, `dep_type`, `hop_depth`, `call_path`, `source`, and
+#'   `is_exported`.
+#'
+#' @examples
+#' temp_root <- tempfile("functracer-example-")
+#' dir.create(temp_root)
+#' pkg_dir <- file.path(temp_root, "demoPkg")
+#' dir.create(pkg_dir)
+#' dir.create(file.path(pkg_dir, "R"))
+#' writeLines(
+#'   c(
+#'     "Package: demoPkg",
+#'     "Version: 0.0.1",
+#'     "Title: Demo Package",
+#'     "Description: Demo package for examples.",
+#'     "License: MIT"
+#'   ),
+#'   file.path(pkg_dir, "DESCRIPTION")
+#' )
+#' writeLines("export(core_fn)", file.path(pkg_dir, "NAMESPACE"))
+#' writeLines(
+#'   c(
+#'     "core_fn <- function(x) {",
+#'     "  x + 1",
+#'     "}"
+#'   ),
+#'   file.path(pkg_dir, "R", "core.R")
+#' )
+#' entry_script <- file.path(temp_root, "main.R")
+#' writeLines("core_fn(3)", entry_script)
+#' analyze_dependencies(entry_script = entry_script, package_dir = pkg_dir)
 #' @export
 analyze_dependencies <- function(
   entry_script,
@@ -202,7 +233,44 @@ write_dependencies_svg <- function(dependencies, output_path) {
 #' @param output_format Output file format. One of `"csv"`, `"json"`, or
 #'   `"svg"`.
 #'
-#' @return Invisibly returns a list with output path and dependency data.
+#' @return Invisibly returns a list with:
+#'   `output_path` (artifact path), `output_format` (selected format), and
+#'   `dependencies` (the same data frame returned by [analyze_dependencies()]).
+#'
+#' @examples
+#' temp_root <- tempfile("functracer-example-")
+#' dir.create(temp_root)
+#' pkg_dir <- file.path(temp_root, "demoPkg")
+#' dir.create(pkg_dir)
+#' dir.create(file.path(pkg_dir, "R"))
+#' writeLines(
+#'   c(
+#'     "Package: demoPkg",
+#'     "Version: 0.0.1",
+#'     "Title: Demo Package",
+#'     "Description: Demo package for examples.",
+#'     "License: MIT"
+#'   ),
+#'   file.path(pkg_dir, "DESCRIPTION")
+#' )
+#' writeLines("export(core_fn)", file.path(pkg_dir, "NAMESPACE"))
+#' writeLines(
+#'   c(
+#'     "core_fn <- function(x) {",
+#'     "  x + 1",
+#'     "}"
+#'   ),
+#'   file.path(pkg_dir, "R", "core.R")
+#' )
+#' entry_script <- file.path(temp_root, "main.R")
+#' writeLines("core_fn(3)", entry_script)
+#' out <- trace_functions(
+#'   entry_script = entry_script,
+#'   package_dir = pkg_dir,
+#'   output_dir = temp_root,
+#'   output_format = "json"
+#' )
+#' file.exists(out$output_path)
 #' @export
 trace_functions <- function(
   entry_script,
