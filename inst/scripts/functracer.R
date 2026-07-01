@@ -78,6 +78,23 @@ build_parser <- function() {
   return(parser)
 }
 
+#' Resolve a parsed CLI argument by underscore or dash key
+#'
+#' @param args Parsed argument list from `argparse`.
+#' @param name Argument name as defined in CLI help (without leading `--`).
+#'
+#' @return The argument value, or `NULL` when not provided.
+get_cli_argument <- function(args, name) {
+  underscore_name <- gsub("-", "_", name)
+  value <- args[[underscore_name]]
+
+  if (is.null(value)) {
+    value <- args[[name]]
+  }
+
+  return(value)
+}
+
 if (!requireNamespace("argparse", quietly = TRUE)) {
   stop("Package 'argparse' is required to run the functracer CLI")
 }
@@ -98,39 +115,48 @@ load_package_functions(pkg_root)
 
 args <- build_parser()$parse_args()
 
-if (!is.null(args[["repo-url"]]) || !is.null(args[["release-tag"]])) {
-  if (is.null(args[["repo-url"]]) || is.null(args[["release-tag"]])) {
+repo_url <- get_cli_argument(args, "repo-url")
+release_tag <- get_cli_argument(args, "release-tag")
+previous_tag <- get_cli_argument(args, "previous-tag")
+package_name <- get_cli_argument(args, "package-name")
+output_format <- get_cli_argument(args, "output-format")
+output_dir <- get_cli_argument(args, "output-dir")
+package_dir <- get_cli_argument(args, "package-dir")
+
+if (!is.null(repo_url) || !is.null(release_tag)) {
+  if (is.null(repo_url) || is.null(release_tag)) {
     stop("Both --repo-url and --release-tag are required for release analysis")
   }
 
   trace_release_impact(
     entry_script = args$entry,
-    repository = args[["repo-url"]],
-    release_tag = args[["release-tag"]],
-    previous_tag = args[["previous-tag"]],
-    package_name = args[["package-name"]],
-    output_format = args[["output-format"]],
-    output_dir = if (is.null(args[["output-dir"]])) {
+    repository = repo_url,
+    release_tag = release_tag,
+    package_subdir = package_dir,
+    previous_tag = previous_tag,
+    package_name = package_name,
+    output_format = output_format,
+    output_dir = if (is.null(output_dir)) {
       "."
     } else {
-      args[["output-dir"]]
+      output_dir
     },
     output_prefix = args$prefix
   )
 } else {
-  if (is.null(args[["package-dir"]])) {
+  if (is.null(package_dir)) {
     stop("--package-dir is required for local dependency tracing")
   }
 
   trace_functions(
     entry_script = args$entry,
-    package_dir = args[["package-dir"]],
-    package_name = args[["package-name"]],
-    output_format = args[["output-format"]],
-    output_dir = if (is.null(args[["output-dir"]])) {
+    package_dir = package_dir,
+    package_name = package_name,
+    output_format = output_format,
+    output_dir = if (is.null(output_dir)) {
       "."
     } else {
-      args[["output-dir"]]
+      output_dir
     },
     output_prefix = args$prefix
   )
