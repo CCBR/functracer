@@ -14,5 +14,5 @@
   "license": "https://spdx.org/licenses/MIT",
   "name": "functracer: Trace Function Dependencies in R Code",
   "url": "https://github.com/CCBR/functracer",
-  "version": "0.1.0"
+  "version": "0.1.0.9000"
 }

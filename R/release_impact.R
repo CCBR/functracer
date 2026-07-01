@@ -122,6 +122,7 @@ lookup_dependency_source_files <- function(dependency_names, function_files) {
 #' @param repository GitHub repository URL or local git repository path containing a tagged package release.
 #' @param release_tag Release tag to analyze.
 #' @param package_name Optional package name override.
+#' @param package_subdir Optional repository subdirectory containing the package.
 #' @param previous_tag Optional previous tag override.
 #' @param output_dir Directory where output artifacts are written.
 #' @param output_prefix Prefix for output files. Defaults to entry script stem.
@@ -136,6 +137,7 @@ trace_release_impact <- function(
   repository,
   release_tag,
   package_name = NULL,
+  package_subdir = NULL,
   previous_tag = NULL,
   output_dir = ".",
   output_prefix = NULL,
@@ -157,9 +159,19 @@ trace_release_impact <- function(
     repo_dir = checkout_dir
   )
 
+  normalized_package_subdir <- ""
+  if (!is.null(package_subdir) && nzchar(package_subdir)) {
+    normalized_package_subdir <- gsub("^/+|/+$", "", package_subdir)
+  }
+
+  package_dir <- checkout_dir
+  if (nzchar(normalized_package_subdir)) {
+    package_dir <- file.path(checkout_dir, normalized_package_subdir)
+  }
+
   analysis <- collect_dependency_analysis(
     entry_script = entry_script,
-    package_dir = checkout_dir,
+    package_dir = package_dir,
     package_name = package_name
   )
 
@@ -169,17 +181,27 @@ trace_release_impact <- function(
     function_files = analysis$function_files
   )
 
+  changed_pathspec <- "R"
+  changed_file_prefix <- "R/"
+  if (nzchar(normalized_package_subdir)) {
+    changed_pathspec <- file.path(normalized_package_subdir, "R")
+    changed_file_prefix <- changed_pathspec
+    changed_file_prefix <- paste0(changed_file_prefix, "/")
+  }
+
   changed_files <- run_git_command(
     c(
       "diff",
       "--name-only",
       paste0(previous_tag, "..", release_tag),
       "--",
-      "R"
+      changed_pathspec
     ),
     repo_dir = checkout_dir
   )
-  changed_r_files <- basename(changed_files[startsWith(changed_files, "R/")])
+  changed_r_files <- basename(
+    changed_files[startsWith(changed_files, changed_file_prefix)]
+  )
 
   dependencies$source_file_changed <- dependencies$source_file %in%
     changed_r_files
