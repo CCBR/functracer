@@ -9,6 +9,7 @@ trace_release_impact(
   repository,
   release_tag,
   package_name = NULL,
+  package_subdir = NULL,
   previous_tag = NULL,
   output_dir = ".",
   output_prefix = NULL,
@@ -23,6 +24,8 @@ trace_release_impact(
 \item{release_tag}{Release tag to analyze.}
 
 \item{package_name}{Optional package name override.}
+
+\item{package_subdir}{Optional repository subdirectory containing the package.}
 
 \item{previous_tag}{Optional previous tag override.}
 
