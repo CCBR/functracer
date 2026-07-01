@@ -28,7 +28,12 @@ against a target package source tree.
 
 ``` r
 # install.packages("remotes")
+
+# install the development version
 remotes::install_github("CCBR/functracer")
+
+# or a specific release
+remotes::install_github("CCBR/functracer", ref = "v0.1.0")
 ```
 
 ## Usage
