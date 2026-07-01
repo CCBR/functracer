@@ -15,3 +15,4 @@
 ^README\.html$
 ^codemeta\.json$
 ^CITATION\.cff$
+^docker$
