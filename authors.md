@@ -11,7 +11,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/CCBR/functracer/blob/main/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/CCBR/functracer/blob/v0.1.0/DESCRIPTION)
 
 Sovacool K (2026). *functracer: Trace Function Dependencies in R Code*.
 R package version 0.1.0, <https://github.com/CCBR/functracer>.
