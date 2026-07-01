@@ -42,7 +42,7 @@ remotes::install_github("CCBR/functracer")
 
 ## Usage
 
-See the [introductor vignette](https://ccbr.github.io/functracer/articles/intro.html) for a detailed introduction.
+See the [introductory vignette](https://ccbr.github.io/functracer/articles/intro.html) for a detailed introduction.
 
 ### R
 
