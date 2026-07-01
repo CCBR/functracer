@@ -140,7 +140,7 @@ release_result$changed_dependencies
 ```
 
 `script_affected` is `TRUE` when at least one traced dependency comes from an
-R source file that changed between `previous_tag` and `release_tag`.
+R source file that changed between the inferred `previous_tag` (or an explicit `previous_tag`) and `release_tag`.
 
 ## Interpretation
 
