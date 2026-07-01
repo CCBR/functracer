@@ -1,4 +1,4 @@
-## functracer development version
+## functracer 0.1.0
 
 This is the first release of functracer! 🎉
 
