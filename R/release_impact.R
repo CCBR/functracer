@@ -135,7 +135,7 @@ lookup_dependency_source_files <- function(dependency_names, function_files) {
 #'   `script_affected`.
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' temp_root <- tempfile("functracer-release-example-")
 #' dir.create(temp_root)
 #'
