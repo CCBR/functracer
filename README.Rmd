@@ -37,7 +37,12 @@ Trace direct and transitive function dependencies for an R script against a targ
 
 ```r
 # install.packages("remotes")
+
+# install the development version
 remotes::install_github("CCBR/functracer")
+
+# or a specific release
+remotes::install_github("CCBR/functracer", ref = "v0.1.0")
 ```
 
 ## Usage
