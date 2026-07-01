@@ -95,6 +95,49 @@ get_cli_argument <- function(args, name) {
   return(value)
 }
 
+#' Resolve the package root for source and installed CLI layouts
+#'
+#' @param script_path Absolute path to `functracer.R`.
+#'
+#' @return Absolute path to the package root containing `R/` and `DESCRIPTION`.
+resolve_package_root <- function(script_path) {
+  candidate_paths <- normalizePath(
+    c(
+      file.path(dirname(script_path), "..", ".."),
+      file.path(dirname(script_path), "..")
+    ),
+    winslash = "/",
+    mustWork = FALSE
+  )
+
+  is_package_root <- vapply(
+    candidate_paths,
+    function(path) {
+      return(
+        dir.exists(file.path(path, "R")) &&
+          file.exists(file.path(path, "DESCRIPTION"))
+      )
+    },
+    logical(1)
+  )
+
+  if (!any(is_package_root)) {
+    stop(
+      "Unable to locate package root from script path: ",
+      script_path,
+      ". Expected a parent directory containing R/ and DESCRIPTION."
+    )
+  }
+
+  pkg_root <- normalizePath(
+    candidate_paths[[which(is_package_root)[[1]]]],
+    winslash = "/",
+    mustWork = TRUE
+  )
+
+  return(pkg_root)
+}
+
 if (!requireNamespace("argparse", quietly = TRUE)) {
   stop("Package 'argparse' is required to run the functracer CLI")
 }
@@ -107,10 +150,7 @@ script_path <- normalizePath(
   sub("^--file=", "", script_arg[1]),
   mustWork = TRUE
 )
-pkg_root <- normalizePath(
-  file.path(dirname(script_path), "..", ".."),
-  mustWork = TRUE
-)
+pkg_root <- resolve_package_root(script_path)
 load_package_functions(pkg_root)
 
 args <- build_parser()$parse_args()
