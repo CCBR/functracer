@@ -47,7 +47,7 @@ Clone a git repository, check out the requested release tag, compare it to
 the previous tag, and identify traced dependencies whose source files changed.
 }
 \examples{
-\donttest{
+\dontrun{
 temp_root <- tempfile("functracer-release-example-")
 dir.create(temp_root)
 
