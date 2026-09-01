@@ -10,7 +10,7 @@ Description: Build direct and transitive function dependency graphs from an
     R entry script and a target package source tree. Exports machine-readable
     and human-readable artifacts (CSV, JSON, SVG) for analysis.
 License: MIT + file LICENSE
-URL: https://github.com/CCBR/functracer
+URL: https://github.com/CCBR/functracer, https://ccbr.github.io/functracer
 BugReports: https://github.com/CCBR/functracer/issues
 Depends:
     R (>= 4.1.0)
