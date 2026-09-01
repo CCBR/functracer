@@ -1,4 +1,4 @@
-bibentry(bibtype = "Software",
+bibentry(bibtype = "Manual",
          key = "sovacool_functracer_2026",
          title = "{functracer}: Trace Function Dependencies in R Code",
          author = c(person(given = "Kelly",
