@@ -11,8 +11,9 @@
   ],
   "codeRepository": "https://github.com/CCBR/functracer",
   "description": "Build direct and transitive function dependency graphs from an R entry script and a target package source tree. Exports machine-readable and human-readable artifacts (CSV, JSON, SVG) for analysis.",
+  "identifier": "https://doi.org/10.5281/zenodo.22238744",
   "license": "https://spdx.org/licenses/MIT",
   "name": "functracer: Trace Function Dependencies in R Code",
-  "url": "https://github.com/CCBR/functracer",
+  "url": "https://ccbr.github.io/functracer",
   "version": "0.1.1.9000"
 }

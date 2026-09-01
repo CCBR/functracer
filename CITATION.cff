@@ -9,6 +9,7 @@ type: software
 license: MIT
 title: 'functracer: Trace Function Dependencies in R Code'
 version: 0.1.1.9000
+doi: 10.5281/zenodo.22238744
 abstract: Build direct and transitive function dependency graphs from an R entry script
   and a target package source tree. Exports machine-readable and human-readable artifacts
   (CSV, JSON, SVG) for analysis.
@@ -17,8 +18,19 @@ authors:
   given-names: Kelly
   email: kelly.sovacool@nih.gov
   orcid: https://orcid.org/0000-0003-3283-829X
+preferred-citation:
+  type: manual
+  title: 'functracer: Trace Function Dependencies in R Code'
+  authors:
+  - family-names: Sovacool
+    given-names: Kelly
+    email: kelly.sovacool@nih.gov
+    orcid: https://orcid.org/0000-0003-3283-829X
+  year: '2026'
+  doi: 10.5281/zenodo.22238744
+  url: https://ccbr.github.io/functracer/
 repository-code: https://github.com/CCBR/functracer
-url: https://github.com/CCBR/functracer
+url: https://ccbr.github.io/functracer
 contact:
 - family-names: Sovacool
   given-names: Kelly
