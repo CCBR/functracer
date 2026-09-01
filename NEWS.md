@@ -1,4 +1,4 @@
-## functracer development version
+## functracer 0.1.1
 
 - fix: support `--package-dir` in `inst/scripts/functracer` for release impact analysis when an R package is inside a repo subdirectory. (#10, @kelly-sovacool)
 
