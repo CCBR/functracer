@@ -85,7 +85,7 @@ out <- trace_functions(
 )
 #> Dependency analysis complete
 #> Format: json
-#> Output: /tmp/RtmpTbsdjo/functracer-example-1b116278c9c7/main_dependencies.json
+#> Output: /tmp/RtmpZyi6mK/functracer-example-1cb620db9b7b/main_dependencies.json
 file.exists(out$output_path)
 #> [1] TRUE
 ```
