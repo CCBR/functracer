@@ -2,6 +2,10 @@
 
 #' Load package R sources into an execution environment
 #'
+#' When running from an installed package location (where `R/` contains only
+#' compiled objects, not `.R` sources), this falls back to loading the package
+#' from the library directory that contains `pkg_root`.
+#'
 #' @param pkg_root Path to the package root.
 #'
 #' @return An environment containing the sourced package functions.
@@ -12,6 +16,22 @@ load_package_functions <- function(pkg_root) {
     full.names = TRUE
   )
   r_files <- sort(r_files)
+
+  if (length(r_files) == 0) {
+    lib_dir <- dirname(pkg_root)
+    if (requireNamespace("functracer", lib.loc = lib_dir, quietly = TRUE)) {
+      library("functracer", lib.loc = lib_dir, character.only = TRUE)
+    } else if (requireNamespace("functracer", quietly = TRUE)) {
+      library("functracer", character.only = TRUE)
+    } else {
+      stop(
+        "Unable to load functracer: no R source files found in ",
+        file.path(pkg_root, "R"),
+        " and package is not installed."
+      )
+    }
+    return(invisible(NULL))
+  }
 
   for (r_file in r_files) {
     sys.source(r_file, envir = globalenv())
