@@ -10,6 +10,7 @@ against a target package source tree.
 
 [![R-CMD-check](https://github.com/CCBR/functracer/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/CCBR/functracer/actions/workflows/R-CMD-check.yaml)
 [![codecov](https://codecov.io/gh/CCBR/functracer/graph/badge.svg?token=5BLOfOM2Z8)](https://codecov.io/gh/CCBR/functracer)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22238744.svg)](https://doi.org/10.5281/zenodo.22238744)
 <!-- badges: end -->
 
 <https://ccbr.github.io/functracer>

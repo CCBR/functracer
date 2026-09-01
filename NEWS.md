@@ -1,5 +1,7 @@
 ## functracer development version
 
+- functracer is now archived in Zenodo with DOI [10.5281/zenodo.22238744](https://doi.org/10.5281/zenodo.22238744)
+
 ## functracer 0.1.1
 
 - fix: support `--package-dir` in `inst/scripts/functracer` for release impact analysis when an R package is inside a repo subdirectory. (#10, @kelly-sovacool)
